@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", "Poppins", sans-serif;
   --font-poppins: "Poppins", sans-serif;
@@ -110,9 +112,7 @@ html.light body {
   color: #111111 !important;
 }
 
-html.light .bg-black {
-  background-color: #f4f4f5 !important;
-}
+/* Keep bg-black dark on elements like hero */
 
 html.light .bg-black\/40,
 html.light .bg-black\/50,
@@ -200,26 +200,22 @@ html.light .bg-zinc-900 {
   background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Fix all dark page hero banner sections */
-html.light .page-hero {
+/* Fix all dark page hero banner and CTA sections */
+html.light .page-hero,
+html.light .dark-cta {
   background: linear-gradient(135deg, rgba(4, 194, 68, 0.08) 0%, #e8f5e9 100%) !important;
 }
 
-html.light .page-hero > div[class*="bg-"] {
+html.light .page-hero .hero-bg-overlay,
+html.light .dark-cta .hero-bg-overlay {
   display: none !important;
 }
 
-/* Fix CTA dark sections */
-html.light .dark-cta {
-  background: linear-gradient(135deg, rgba(4, 194, 68, 0.08) 0%, #f0faf2 100%) !important;
-}
-
-html.light .dark-cta > div[class*="bg-"] {
-  display: none !important;
-}
+/* Fix CTA dark sections - Keep them dark and premium */
 
 html.light footer {
-  background-color: #e4e4e7 !important;
+  background-color: #ffffff !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Fix dark input/form fields */
@@ -237,10 +233,26 @@ html.light textarea::placeholder {
 }
 
 /* Fix Stats section dark bg */
-html.light section.py-16.bg-black\/50,
-html.light .bg-\[\#0A0C10\] {
+.stats-section {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+.stats-number {
+  color: #ffffff;
+}
+.stats-label {
+  color: #94a3b8; /* slate-400 */
+}
+
+html.light .stats-section {
   background-color: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html.light .stats-number {
+  color: #0f172a !important; /* dark slate */
+}
+html.light .stats-label {
+  color: #64748b !important; /* slate-500 */
 }
 
 /* Fix navbar text always visible */
@@ -270,6 +282,37 @@ html.light .keep-dark-context .text-slate-400 {
 
 html.light .keep-dark-context .bg-white\/5 {
   background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Keep glass cards dark in a dark context */
+html.light .keep-dark-context .glass-card,
+html.light .dark .glass-card {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.light .keep-dark-context .text-white,
+html.light .keep-dark-context .text-slate-300,
+html.light .keep-dark-context .text-slate-400,
+html.light .dark .text-white,
+html.light .dark .text-slate-300,
+html.light .dark .text-slate-400 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Keep overlays dark in dark contexts */
+html.light .keep-dark-context .bg-black\/40,
+html.light .dark .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+html.light .keep-dark-context .bg-black\/50,
+html.light .dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+html.light .keep-dark-context .bg-black\/90,
+html.light .dark .bg-black\/90 {
+  background-color: rgba(0, 0, 0, 0.9) !important;
 }
 
 

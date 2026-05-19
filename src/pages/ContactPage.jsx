@@ -7,8 +7,8 @@ const ContactPage = () => {
 
       {/* ── Hero Banner ── */}
       <section className="page-hero relative flex items-center justify-center text-center overflow-hidden" style={{ minHeight: '360px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)] hero-bg-overlay"></div>
         <div className="relative z-10 px-6 py-28">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

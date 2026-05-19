@@ -4,23 +4,37 @@ import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getTestimonials } from '../services/api';
 
 const Testimonials = () => {
-  const [testimonialsList] = useState(() => getTestimonials());
+  const [testimonialsList, setTestimonialsList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  useEffect(() => {
+    let mounted = true;
+    const fetchTestimonials = async () => {
+      const data = await getTestimonials();
+      if (mounted) {
+        setTestimonialsList(data);
+      }
+    };
+    fetchTestimonials();
+    return () => { mounted = false; };
+  }, []);
+
   const nextSlide = useCallback(() => {
+    if (testimonialsList.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % testimonialsList.length);
   }, [testimonialsList.length]);
 
   const prevSlide = () => {
+    if (testimonialsList.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + testimonialsList.length) % testimonialsList.length);
   };
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || testimonialsList.length === 0) return;
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
-  }, [nextSlide, isPaused]);
+  }, [nextSlide, isPaused, testimonialsList.length]);
 
   if (!testimonialsList.length) return null;
 
@@ -36,14 +50,14 @@ const Testimonials = () => {
             viewport={{ once: true }}
             className="text-4xl font-bold mb-4"
           >
-            Client <span className="text-gradient">Testimonials</span>
+            What <span className="text-gradient">People Say</span>
           </motion.h2>
-          <p className="text-slate-400">Hear what our satisfied clients have to say about us.</p>
+          <p className="text-slate-400">Hear what our leaders, team, clients, and guests have to say about us.</p>
         </div>
 
         <div className="max-w-4xl mx-auto relative group">
           <div 
-            className="relative h-[400px] md:h-[300px]"
+            className="relative min-h-[420px] sm:min-h-[340px] md:h-[300px]"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
@@ -54,7 +68,7 @@ const Testimonials = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="glass-card p-8 md:p-12 h-full flex flex-col justify-center relative"
+                className="glass-card p-6 sm:p-12 h-full flex flex-col justify-center relative"
               >
                 <Quote size={60} className="absolute top-8 right-8 text-[#04C244]/10" />
                 
@@ -68,18 +82,27 @@ const Testimonials = () => {
                   ))}
                 </div>
 
-                <p className="text-xl md:text-2xl text-slate-300 italic mb-10 leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 italic mb-8 leading-relaxed">
                   "{testimonialsList[currentIndex].review || testimonialsList[currentIndex].text}"
                 </p>
 
                 <div className="flex items-center gap-5">
-                  <div className="relative">
+                  <div className="relative w-16 h-16 rounded-full border-2 border-[#04C244]/30 overflow-hidden flex items-center justify-center bg-black/40 shrink-0">
                     <div className="absolute inset-0 bg-[#04C244] blur-lg opacity-20 rounded-full"></div>
-                    <img 
-                      src={testimonialsList[currentIndex].img || testimonialsList[currentIndex].image} 
-                      alt={testimonialsList[currentIndex].name} 
-                      className="w-16 h-16 rounded-full object-cover border-2 border-[#04C244]/30 relative z-10" 
-                    />
+                    {(testimonialsList[currentIndex].img || testimonialsList[currentIndex].image) ? (
+                      <img 
+                        src={testimonialsList[currentIndex].img || testimonialsList[currentIndex].image} 
+                        alt={testimonialsList[currentIndex].name} 
+                        className="w-full h-full object-cover relative z-10" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#0A0C10] via-slate-900 to-black select-none relative z-10">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(4,194,68,0.15)_0%,transparent_70%)]"></div>
+                        <span className="text-xl font-black text-[#04C244] tracking-widest font-mono drop-shadow-[0_0_8px_rgba(4,194,68,0.4)]">
+                          {testimonialsList[currentIndex].name ? testimonialsList[currentIndex].name.charAt(0).toUpperCase() : '?'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h4 className="font-bold text-white text-lg">{testimonialsList[currentIndex].name}</h4>

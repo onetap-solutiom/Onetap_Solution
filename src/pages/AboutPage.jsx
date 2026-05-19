@@ -1,20 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Target, Eye, Users, Award, Zap, Globe, ShieldCheck, TrendingUp } from 'lucide-react';
 import { getTeam, getStats } from '../services/api';
 
 const AboutPage = () => {
-  const [stats] = useState(() => {
-    const s = getStats();
-    return [
-      { number: s.projects + '+', label: 'Projects Delivered' },
-      { number: '3+', label: 'Years Experience' },
-      { number: s.clients + '+', label: 'Happy Clients' },
-      { number: '10+', label: 'Team Members' },
-    ];
-  });
-  const [teamMembers] = useState(() => getTeam());
+  const [stats, setStats] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      const [teamData, statsData] = await Promise.all([getTeam(), getStats()]);
+      if (mounted) {
+        setTeamMembers(teamData);
+        setStats([
+          { number: statsData.projects + '+', label: 'Projects Delivered' },
+          { number: '3+', label: 'Years Experience' },
+          { number: statsData.clients + '+', label: 'Happy Clients' },
+          { number: '10+', label: 'Team Members' },
+        ]);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
 
   const values = [
     { icon: <Zap size={28} />, title: 'Innovation', desc: 'We embrace the latest technologies to deliver cutting-edge digital solutions.' },
@@ -33,8 +43,8 @@ const AboutPage = () => {
       {/* ── Hero Banner ── */}
       <section className="page-hero relative flex items-center justify-center text-center overflow-hidden" style={{ minHeight: '380px' }}>
         {/* Dark green radial gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)] hero-bg-overlay"></div>
 
         <div className="relative z-10 px-6 py-32">
           <motion.h1
@@ -166,12 +176,21 @@ const AboutPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {teamMembers.map((member, i) => (
               <motion.div key={i} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.15 }} className="glass-card overflow-hidden text-center group">
-                <div className="relative overflow-hidden h-56">
-                  <img
-                    src={member.image || member.img}
-                    alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                <div className="relative overflow-hidden h-56 flex items-center justify-center bg-linear-to-br from-[#0A0C10] via-slate-900 to-black select-none border-b border-white/5">
+                  {(member.image || member.img) ? (
+                    <img
+                      src={member.image || member.img}
+                      alt={member.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#0A0C10] via-slate-900 to-black select-none relative">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(4,194,68,0.15)_0%,transparent_70%)]"></div>
+                      <span className="text-6xl font-black text-[#04C244]/80 tracking-widest font-mono transform group-hover:scale-110 group-hover:text-[#04C244] transition-all duration-500 drop-shadow-[0_0_15px_rgba(4,194,68,0.3)]">
+                        {member.name ? member.name.charAt(0).toUpperCase() : '?'}
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent"></div>
                 </div>
                 <div className="p-6">
@@ -186,7 +205,7 @@ const AboutPage = () => {
 
       {/* ── CTA ── */}
       <section className="dark-cta py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
         <div className="relative z-10 text-center container mx-auto px-6">
           <motion.h2 {...fadeUp} className="text-4xl font-bold text-white mb-4">
             Ready to start your <span className="text-[#04C244]">digital journey?</span>

@@ -123,7 +123,7 @@ export const AdminProvider = ({ children }) => {
                     fetch(COLLECTION_APIS.testimonials, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
                     fetch(COLLECTION_APIS.messages, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
                     fetch(COLLECTION_APIS.news, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch('http://localhost:5000/api/stats/visitor-count', { headers }).then(r => r.json()).catch(() => ({ success: false, data: { visitorCount: 1240 } }))
+                    fetch('http://localhost:5000/api/stats/dashboard', { headers }).then(r => r.json()).catch(() => ({ success: false, data: null }))
                 ]);
 
                 setData(prev => {
@@ -134,7 +134,7 @@ export const AdminProvider = ({ children }) => {
                     const test = testimonialsRes.success ? testimonialsRes.data : prev.testimonials;
                     const msg = messagesRes.success ? messagesRes.data : prev.messages;
                     const news = newsRes.success ? newsRes.data : prev.news;
-                    const visitorCount = statsRes.success && statsRes.data ? statsRes.data.visitorCount : prev.visitorCount;
+                    const dashboardStats = statsRes.success && statsRes.data ? statsRes.data : prev.dashboardStats;
 
                     return {
                         ...prev,
@@ -145,7 +145,8 @@ export const AdminProvider = ({ children }) => {
                         testimonials: test,
                         messages: msg,
                         news: news,
-                        visitorCount: visitorCount,
+                        visitorCount: dashboardStats?.stats?.visitors?.value || prev.visitorCount,
+                        dashboardStats: dashboardStats,
                         stats: {
                             projects: p.length,
                             clients: 20,

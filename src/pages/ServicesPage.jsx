@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MonitorPlay, Smartphone, GitPullRequest, Megaphone, Palette, ArrowRight, Code } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -21,7 +21,19 @@ const renderIcon = (icon) => {
 };
 
 const ServicesPage = () => {
-  const [servicesList] = useState(() => getServices());
+  const [servicesList, setServicesList] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchServices = async () => {
+      const services = await getServices();
+      if (mounted) {
+        setServicesList(services);
+      }
+    };
+    fetchServices();
+    return () => { mounted = false; };
+  }, []);
   const fadeUp = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
@@ -34,8 +46,8 @@ const ServicesPage = () => {
 
       {/* ── Hero Banner ── */}
       <section className="page-hero relative flex items-center justify-center text-center overflow-hidden" style={{ minHeight: '360px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)] hero-bg-overlay"></div>
         <div className="relative z-10 px-6 py-28">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -122,7 +134,7 @@ const ServicesPage = () => {
 
       {/* ── CTA ── */}
       <section className="dark-cta py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
         <div className="relative z-10 text-center container mx-auto px-6">
           <motion.h2 {...fadeUp} className="text-4xl font-bold text-white mb-4">
             Have a project in <span className="text-[#04C244]">mind?</span>

@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
-import { submitContactMessage } from '../services/api';
+import { submitContactMessage, getSettings } from '../services/api';
 
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState('idle'); // idle, sending, success, error
+  const [settings, setSettings] = useState({
+    company_email: 'hello@onetapsolution.com',
+    contact_phone: '+252 61 9586339',
+    office_location: 'Mogadishu, Somalia'
+  });
+
+  useEffect(() => {
+    let mounted = true;
+    getSettings().then(data => {
+      if (mounted && data) {
+        setSettings(data);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,8 +73,10 @@ const Contact = () => {
               </div>
               <div>
                 <h4 className="text-lg font-semibold text-white mb-2">Phone</h4>
-                <p className="text-slate-400">+252 61 9586339</p>
-                <p className="text-slate-400">+252 61 3377606</p>
+                <p className="text-slate-400">{settings.contact_phone}</p>
+                {settings.contact_phone === '+252 61 9586339' && (
+                  <p className="text-slate-400">+252 61 3377606</p>
+                )}
               </div>
             </div>
             
@@ -69,7 +86,7 @@ const Contact = () => {
               </div>
               <div>
                 <h4 className="text-lg font-semibold text-white mb-2">Email</h4>
-                <p className="text-slate-400">hello@onetapsolution.com</p>
+                <p className="text-slate-400">{settings.company_email}</p>
               </div>
             </div>
 
@@ -79,7 +96,7 @@ const Contact = () => {
               </div>
               <div>
                 <h4 className="text-lg font-semibold text-white mb-2">Location</h4>
-                <p className="text-slate-400">Mogadishu, Somalia</p>
+                <p className="text-slate-400">{settings.office_location}</p>
               </div>
             </div>
           </motion.div>

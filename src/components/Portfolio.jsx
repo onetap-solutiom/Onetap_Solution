@@ -5,15 +5,24 @@ import { ExternalLink } from 'lucide-react';
 import { getProjects } from '../services/api';
 
 const Portfolio = () => {
-  const [projectsList, setProjectsList] = useState(() => getProjects().slice(0, 3));
+  const [projectsList, setProjectsList] = useState([]);
 
   useEffect(() => {
-    const handleUpdate = () => setProjectsList(getProjects().slice(0, 3));
+    let mounted = true;
+    const fetchProjects = async () => {
+      const projects = await getProjects();
+      if (mounted) {
+        setProjectsList(projects.slice(0, 3));
+      }
+    };
+
+    fetchProjects();
+
+    const handleUpdate = () => fetchProjects();
     window.addEventListener('app-data-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
     return () => {
+      mounted = false;
       window.removeEventListener('app-data-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
     };
   }, []);
   return (
@@ -39,7 +48,7 @@ const Portfolio = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {projectsList.map((project, index) => (
             <motion.div
               key={index}
@@ -47,7 +56,7 @@ const Portfolio = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
-              className="group relative rounded-2xl overflow-hidden glass-card border-none"
+              className="group relative rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border-2 border-[#04C244] shadow-lg shadow-[#04C244]/20 dark:shadow-2xl hover:shadow-[#04C244]/40 w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] max-w-sm transition-all"
             >
               <div className="aspect-video overflow-hidden bg-zinc-900">
                 <img 
@@ -57,14 +66,14 @@ const Portfolio = () => {
                   onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/1e1e1e/04C244?text=Project+Preview'; }}
                 />
               </div>
-              <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 project-overlay">
-                <span className="text-[#04C244] text-sm font-medium mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 text-shadow-sm">
+              <div className="absolute inset-0 bg-linear-to-t from-black via-black/75 to-transparent opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 sm:p-6 project-overlay">
+                <span className="text-[#04C244] text-sm font-medium mb-1 lg:translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-300 text-shadow-sm">
                   {project.category}
                 </span>
-                <h3 className="text-xl font-bold text-white mb-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 text-shadow-md">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-4 lg:translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-300 delay-75 text-shadow-md">
                   {project.title}
                 </h3>
-                <div className="flex gap-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                <div className="flex gap-3 lg:translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-300 delay-100">
                   <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-colors keep-white">
                     <ExternalLink size={18} />
                   </button>
@@ -84,7 +93,7 @@ const Portfolio = () => {
           transition={{ delay: 0.8 }}
           className="text-center mt-12"
         >
-          <Link to="/portfolio" className="inline-block px-8 py-3 rounded-full border border-zinc-800 hover:border-[#04C244] text-white font-medium transition-colors">
+          <Link to="/portfolio" className="inline-block px-8 py-3 rounded-full border border-black/15 dark:border-white/10 hover:border-[#04C244] dark:hover:border-[#04C244] text-black dark:text-white font-medium transition-colors">
             See All Projects
           </Link>
         </motion.div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MonitorPlay, Smartphone, GitPullRequest, Palette, Megaphone, ArrowRight, Code } from 'lucide-react';
@@ -21,7 +21,20 @@ const renderIcon = (icon) => {
 };
 
 const Services = () => {
-  const [servicesList] = useState(() => getServices().slice(0, 3));
+  const [servicesList, setServicesList] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchServices = async () => {
+      const services = await getServices();
+      if (mounted) {
+        setServicesList(services.slice(0, 3));
+      }
+    };
+    fetchServices();
+    return () => { mounted = false; };
+  }, []);
+  
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
@@ -45,7 +58,7 @@ const Services = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {servicesList.map((service, index) => (
             <motion.div
               key={index}
@@ -53,7 +66,7 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
-              className="glass-card p-8 group hover:border-[#04C244]/50 transition-colors"
+              className="glass-card p-8 group hover:border-[#04C244]/50 transition-colors w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] max-w-sm"
             >
               <div className="w-16 h-16 rounded-2xl bg-zinc-900/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 {renderIcon(service.icon)}
@@ -81,7 +94,7 @@ const Services = () => {
           transition={{ delay: 0.8 }}
           className="text-center mt-12"
         >
-          <Link to="/services" className="inline-block px-8 py-3 rounded-full border border-zinc-800 hover:border-[#04C244] text-white font-medium transition-colors">
+          <Link to="/services" className="inline-block px-8 py-3 rounded-full border border-black/15 dark:border-white/10 hover:border-[#04C244] dark:hover:border-[#04C244] text-black dark:text-white font-medium transition-colors">
             View All Services
           </Link>
         </motion.div>

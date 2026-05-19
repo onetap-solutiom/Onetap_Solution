@@ -496,6 +496,28 @@ INSERT INTO services (title, slug, description, icon, sort_order, status) VALUES
 ON DUPLICATE KEY UPDATE title = VALUES(title);
 
 -- ================================================================
+-- SECTION 20 — Site Settings
+-- ================================================================
+
+CREATE TABLE IF NOT EXISTS settings (
+    id              INT UNSIGNED        NOT NULL AUTO_INCREMENT,
+    company_email   VARCHAR(120)        NOT NULL DEFAULT 'info@onetapsolution.com',
+    contact_phone   VARCHAR(30)         NOT NULL DEFAULT '+252 61 9586339',
+    office_location VARCHAR(255)        NOT NULL DEFAULT 'Mogadishu, Somalia',
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Global site configurations and contact details';
+
+INSERT INTO settings (id, company_email, contact_phone, office_location)
+VALUES (1, 'info@onetapsolution.com', '+252 61 9586339', 'Mogadishu, Somalia')
+ON DUPLICATE KEY UPDATE 
+    company_email = VALUES(company_email),
+    contact_phone = VALUES(contact_phone),
+    office_location = VALUES(office_location);
+
+-- ================================================================
 -- DONE
 -- ================================================================
 SELECT
@@ -503,4 +525,5 @@ SELECT
     (SELECT COUNT(*) FROM roles)       AS Roles_Created,
     (SELECT COUNT(*) FROM permissions) AS Permissions_Created,
     (SELECT COUNT(*) FROM users)       AS Admin_Accounts,
-    (SELECT COUNT(*) FROM services)    AS Services_Seeded;
+    (SELECT COUNT(*) FROM services)    AS Services_Seeded,
+    (SELECT COUNT(*) FROM settings)    AS Settings_Seeded;

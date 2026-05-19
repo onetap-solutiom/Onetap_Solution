@@ -4,16 +4,24 @@ import { Calendar, User, ArrowRight, Newspaper, X } from 'lucide-react';
 import { getNews } from '../services/api';
 
 const NewsPage = () => {
-  const [news, setNews] = useState(() => getNews());
+  const [news, setNews] = useState([]);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   useEffect(() => {
-    const handleUpdate = () => setNews(getNews());
+    let mounted = true;
+    const fetchNews = async () => {
+      const newsData = await getNews();
+      if (mounted) {
+        setNews(newsData);
+      }
+    };
+    fetchNews();
+
+    const handleUpdate = () => fetchNews();
     window.addEventListener('app-data-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
     return () => {
+      mounted = false;
       window.removeEventListener('app-data-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
     };
   }, []);
 
@@ -21,8 +29,8 @@ const NewsPage = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="page-hero relative flex items-center justify-center text-center overflow-hidden" style={{ minHeight: '360px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)] hero-bg-overlay"></div>
         <div className="relative z-10 px-6 py-28">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -146,7 +154,7 @@ const NewsPage = () => {
       </AnimatePresence>
 
       {/* Newsletter Section */}
-      <section className="py-24 bg-white/2 border-y border-white/5">
+      <section className="py-24 bg-white/2 border-y border-white/5 keep-dark-context">
         <div className="container mx-auto px-6 text-center">
           <h3 className="text-3xl font-bold text-white mb-4">Never miss an update</h3>
           <p className="text-slate-400 mb-10 max-w-xl mx-auto">Subscribe to our newsletter and get the latest news delivered directly to your inbox.</p>

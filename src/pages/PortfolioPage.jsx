@@ -8,15 +8,24 @@ const categories = ['All', 'Web Development', 'Mobile Apps', 'Multimedia', 'Desi
 
 const PortfolioPage = () => {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [projectsList, setProjectsList] = useState(() => getProjects());
+  const [projectsList, setProjectsList] = useState([]);
 
   useEffect(() => {
-    const handleUpdate = () => setProjectsList(getProjects());
+    let mounted = true;
+    const fetchProjects = async () => {
+      const projects = await getProjects();
+      if (mounted) {
+        setProjectsList(projects);
+      }
+    };
+
+    fetchProjects();
+
+    const handleUpdate = () => fetchProjects();
     window.addEventListener('app-data-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
     return () => {
+      mounted = false;
       window.removeEventListener('app-data-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
     };
   }, []);
 
@@ -29,8 +38,8 @@ const PortfolioPage = () => {
 
       {/* ── Hero Banner ── */}
       <section className="page-hero relative flex items-center justify-center text-center overflow-hidden" style={{ minHeight: '360px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#04C24415_0%,transparent_60%)] hero-bg-overlay"></div>
         <div className="relative z-10 px-6 py-28">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -99,9 +108,9 @@ const PortfolioPage = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.85 }}
                   transition={{ duration: 0.3 }}
-                  className="group relative rounded-2xl overflow-hidden glass-card border border-white/10 hover:border-[#04C244]/30 transition-colors"
+                  className="group relative rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 border-2 border-[#04C244] shadow-lg shadow-[#04C244]/20 dark:shadow-2xl hover:shadow-[#04C244]/40 transition-all"
                 >
-                  <div className="aspect-video overflow-hidden bg-[#1e1e1e]">
+                  <div className="aspect-video overflow-hidden bg-slate-100 dark:bg-[#1e1e1e]">
                     <img
                       src={project.image || 'https://placehold.co/600x400/1e1e1e/04C244?text=Project+Preview'}
                       alt={project.title}
@@ -119,9 +128,9 @@ const PortfolioPage = () => {
                     </button>
                   </div>
                   {/* Always-visible card footer */}
-                  <div className="p-5 border-t border-white/5">
+                  <div className="p-5 border-t border-slate-100 dark:border-white/5 transition-colors">
                     <span className="text-[#04C244] text-xs font-semibold uppercase tracking-widest">{project.category}</span>
-                    <h3 className="text-white font-semibold mt-1">{project.title}</h3>
+                    <h3 className="text-slate-900 dark:text-white font-semibold mt-1 transition-colors">{project.title}</h3>
                   </div>
                 </motion.div>
               ))}
@@ -150,7 +159,7 @@ const PortfolioPage = () => {
 
       {/* ── CTA ── */}
       <section className="dark-cta py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0d4a1f_0%,#000000_70%)] hero-bg-overlay"></div>
         <div className="relative z-10 text-center container mx-auto px-6">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}

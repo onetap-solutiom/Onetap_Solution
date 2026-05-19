@@ -20,9 +20,9 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden transition-colors duration-300">
       {/* Background Slider */}
-      <div className="absolute inset-0 z-0 bg-black">
+      <div className="absolute inset-0 z-0 bg-white dark:bg-black transition-colors">
         <AnimatePresence>
           <motion.img
             key={currentBg}
@@ -35,8 +35,8 @@ const Hero = () => {
             alt="Hero Background"
           />
         </AnimatePresence>
-        {/* Soft overlay for text readability only, no heavy black gradients */}
-        <div className="absolute inset-0 bg-black/40"></div>
+        {/* Overlay changes based on theme */}
+        <div className="absolute inset-0 bg-white/80 dark:bg-black/50 transition-colors duration-300"></div>
       </div>
       
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#04C244]/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -53,7 +53,7 @@ const Hero = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 text-sm font-medium text-slate-300"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors"
           >
             <Sparkles size={16} className="text-[#04C244]" />
             <span>Innovating Somalia's Digital Future</span>
@@ -63,7 +63,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
+            className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-slate-900 dark:text-white transition-colors"
           >
             Smart Digital <br className="hidden md:block" />
             <span className="text-gradient">Solutions</span>
@@ -73,7 +73,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed transition-colors"
           >
             We create smart digital solutions built for speed, innovation, and business growth. 
             Everything you need is connected in one seamless experience — simple, modern, and always just one tap away.
@@ -94,7 +94,7 @@ const Hero = () => {
             </Link>
             <Link 
               to="/portfolio" 
-              className="w-full sm:w-auto px-8 py-4 rounded-xl glass-card text-white font-medium hover:bg-white/10 transition-all flex items-center justify-center"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl glass-card text-slate-900 dark:text-white font-medium hover:bg-black/5 dark:hover:bg-white/10 transition-all flex items-center justify-center"
             >
               View Projects
             </Link>

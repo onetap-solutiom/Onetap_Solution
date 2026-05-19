@@ -56,14 +56,14 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'
+        isScrolled ? 'bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-black/5 dark:border-white/10 py-4' : 'bg-transparent py-6'
       }`}
     >
       <div className="container mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-3 group">
           <img src="/assets/images/logo.png" alt="OneTap Solution" className="h-14 w-auto group-hover:scale-105 transition-transform" />
-          <span className="text-2xl font-bold text-white tracking-wide">
+          <span className="text-2xl font-bold text-black dark:text-white tracking-wide">
             OneTap <span className="text-[#04C244]">Solution</span>
           </span>
         </NavLink>
@@ -77,7 +77,7 @@ const Navbar = () => {
                   to={link.path}
                   className={({ isActive }) =>
                     `text-sm font-medium transition-colors hover:text-[#04C244] ${
-                      isActive ? 'text-[#04C244] border-b-2 border-[#04C244] pb-1' : 'text-slate-300'
+                      isActive ? 'text-[#04C244] border-b-2 border-[#04C244] pb-1' : 'text-slate-600 dark:text-slate-300'
                     }`
                   }
                 >
@@ -91,7 +91,7 @@ const Navbar = () => {
           <motion.button
             onClick={toggleTheme}
             whileTap={{ scale: 0.85 }}
-            className="w-9 h-9 rounded-full border border-white/15 hover:border-[#04C244] flex items-center justify-center transition-colors text-slate-300 hover:text-[#04C244]"
+            className="w-9 h-9 rounded-full border border-black/15 dark:border-white/15 hover:border-[#04C244] flex items-center justify-center transition-colors text-slate-600 dark:text-slate-300 hover:text-[#04C244]"
             aria-label="Toggle theme"
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
@@ -114,7 +114,7 @@ const Navbar = () => {
           <motion.button
             onClick={toggleTheme}
             whileTap={{ scale: 0.85 }}
-            className="w-9 h-9 rounded-full border border-white/15 hover:border-[#04C244] flex items-center justify-center transition-colors text-slate-300 hover:text-[#04C244]"
+            className="w-9 h-9 rounded-full border border-black/15 dark:border-white/15 hover:border-[#04C244] flex items-center justify-center transition-colors text-slate-600 dark:text-slate-300 hover:text-[#04C244]"
           >
             {isDark ? <Moon size={17} /> : <Sun size={17} />}
           </motion.button>

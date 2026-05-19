@@ -23,7 +23,9 @@ from routes.newsletter_routes import newsletter_bp
 from routes.user_routes import user_bp
 from routes.news_routes import news_bp
 from routes.stats_routes import stats_bp
+from routes.setting_routes import setting_bp
 from models.visit_model import Visit
+from models.setting_model import Setting
 
 
 def create_app(config_name='default'):
@@ -64,6 +66,7 @@ def create_app(config_name='default'):
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(news_bp, url_prefix='/api/news')
     app.register_blueprint(stats_bp, url_prefix='/api/stats')
+    app.register_blueprint(setting_bp, url_prefix='/api/settings')
     
     # Health check route
     @app.route('/api/health', methods=['GET'])

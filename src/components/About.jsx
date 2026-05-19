@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const About = () => {
   return (
-    <section className="py-24 bg-black/50">
+    <section className="py-24 bg-white dark:bg-black/50 transition-colors duration-300">
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           
@@ -19,7 +19,7 @@ const About = () => {
               <img 
                 src="/assets/images/about.png" 
                 alt="OneTap Solution Team" 
-                className="relative rounded-2xl border border-white/10 shadow-2xl w-full object-cover"
+                className="relative rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl w-full object-cover transition-colors"
               />
             </div>
           </motion.div>
@@ -34,17 +34,17 @@ const About = () => {
             <div className="inline-block px-4 py-1.5 rounded-full border border-[#04C244]/30 bg-[#04C244]/10 text-[#04C244] text-sm font-medium">
               Who We Are
             </div>
-            <h2 className="text-4xl font-bold">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white transition-colors">
               About <span className="text-gradient">Us</span>
             </h2>
-            <p className="text-slate-400 leading-relaxed text-lg">
+            <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-lg transition-colors">
               OneTap Solution is a modern technology company dedicated to delivering world-class digital innovation to our country.
               We focus on bridging the technology gap by creating smart, modern, and impactful digital experiences that empower businesses and communities.
             </p>
             <div className="pt-4">
               <Link 
                 to="/about" 
-                className="px-8 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors"
+                className="px-8 py-3 rounded-lg bg-transparent hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white font-medium transition-colors"
               >
                 Learn More About Us
               </Link>

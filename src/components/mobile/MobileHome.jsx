@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   MapPin, Bell, Search, SlidersHorizontal, 
   ChevronRight, Bookmark, Settings, Palette, Film, Megaphone, Smartphone, Code, Globe
@@ -8,6 +8,7 @@ import { getServices, getProjects, getNews } from '../../services/api';
 
 // Icon mapping for services
 const getIcon = (iconName) => {
+  if (!iconName) return Globe;
   const icon = iconName.toLowerCase();
   if (icon.includes('laptop') || icon.includes('code')) return Code;
   if (icon.includes('mobile') || icon.includes('smartphone')) return Smartphone;
@@ -33,9 +34,27 @@ const getServiceColor = (index) => {
 
 const MobileHome = () => {
   const [activeBanner, setActiveBanner] = useState(0);
-  const [services] = useState(() => getServices());
-  const [projects] = useState(() => getProjects());
-  const [news] = useState(() => getNews());
+  const [services, setServices] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      const [servicesData, projectsData, newsData] = await Promise.all([
+        getServices(),
+        getProjects(),
+        getNews()
+      ]);
+      if (mounted) {
+        setServices(servicesData);
+        setProjects(projectsData);
+        setNews(newsData);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
 
   // Use news or projects for banners
   const bannerData = news.length > 0 ? news.slice(0, 3) : projects.slice(0, 3);

@@ -8,6 +8,11 @@ class Visit(db.Model):
     ip_address = db.Column(db.String(45), nullable=True)
     user_agent = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    def __init__(self, ip_address: str = None, user_agent: str = None, **kwargs):
+        super().__init__(**kwargs)
+        self.ip_address = ip_address
+        self.user_agent = user_agent
     
     def to_dict(self):
         return {

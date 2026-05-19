@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Send, ArrowRight } from 'lucide-react';
-import { subscribeNewsletter } from '../services/api';
+import { subscribeNewsletter, getSettings } from '../services/api';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [settings, setSettings] = useState({
+    company_email: 'hello@onetapsolution.com',
+    contact_phone: '+252 61 9586339',
+    office_location: 'Mogadishu, Somalia'
+  });
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    let mounted = true;
+    getSettings().then(data => {
+      if (mounted && data) {
+        setSettings(data);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <footer className="relative bg-black overflow-hidden">
@@ -117,23 +132,23 @@ const Footer = () => {
           <div className="space-y-6">
             <h4 className="text-white font-semibold mb-6 uppercase tracking-widest text-xs">Contact Us</h4>
             <div className="space-y-4">
-              <a href="tel:+252619586339" className="flex items-center gap-3 text-sm text-slate-400 hover:text-[#04C244] transition-colors group">
+              <a href={`tel:${settings.contact_phone.replace(/\s+/g, '')}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-[#04C244] transition-colors group">
                 <span className="w-9 h-9 rounded-full border border-white/10 group-hover:border-[#04C244] flex items-center justify-center transition-colors shrink-0">
                   <Phone size={15} className="text-[#04C244]" />
                 </span>
-                +252 61 9586339
+                {settings.contact_phone}
               </a>
-              <a href="mailto:hello@onetapsolution.com" className="flex items-center gap-3 text-sm text-slate-400 hover:text-[#04C244] transition-colors group">
+              <a href={`mailto:${settings.company_email}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-[#04C244] transition-colors group">
                 <span className="w-9 h-9 rounded-full border border-white/10 group-hover:border-[#04C244] flex items-center justify-center transition-colors shrink-0">
                   <Mail size={15} className="text-[#04C244]" />
                 </span>
-                hello@onetapsolution.com
+                {settings.company_email}
               </a>
               <p className="flex items-center gap-3 text-sm text-slate-400">
                 <span className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center shrink-0">
                   <MapPin size={15} className="text-[#04C244]" />
                 </span>
-                Mogadishu, Somalia
+                {settings.office_location}
               </p>
             </div>
 

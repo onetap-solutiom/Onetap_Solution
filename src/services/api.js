@@ -4,71 +4,94 @@
  * This means any change an admin makes is instantly visible to customers.
  */
 
-const APP_DATA_KEY = 'ots-app-data';
+const API_BASE = 'http://localhost:5000/api';
 
-const defaultData = {
-  projects: [],
-  services: [],
-  testimonials: [],
-  team: [],
-  stats: { projects: 0, clients: 20, services: 0, satisfaction: 99 },
-  news: [],
-};
-
-/**
- * Get the full app data (merges stored data with defaults)
- */
-function getAppData() {
+export async function getProjects() {
   try {
-    const raw = localStorage.getItem(APP_DATA_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      return { ...defaultData, ...parsed };
+    const res = await fetch(`${API_BASE}/projects/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data.map(p => ({
+        id: p.id,
+        title: p.name || p.title,
+        category: p.category || 'Web Development',
+        desc: p.desc || p.description || '',
+        image: p.image || p.img || '',
+        url: p.url || p.demo_link || '#',
+        deadline: p.deadline || '',
+        progress: p.progress || 0,
+        client: p.client || ''
+      }));
     }
   } catch (e) {
-    console.error('api.js: failed to read app data', e);
+    console.error('api.js: failed to fetch projects', e);
   }
-  return defaultData;
+  return [];
 }
 
-export function getProjects() {
-  const d = getAppData();
-  return (d.projects || []).map(p => ({
-    id: p.id,
-    title: p.name || p.title,
-    category: p.category || 'Web Development',
-    desc: p.desc || p.description || '',
-    image: p.image || p.img || '',
-    url: p.url || '#',
-    deadline: p.deadline || '',
-    progress: p.progress || 0,
-    client: p.client || ''
-  }));
+export async function getServices() {
+  try {
+    const res = await fetch(`${API_BASE}/services/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data.filter(s => s.status !== 'Inactive');
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch services', e);
+  }
+  return [];
 }
 
-export function getServices() {
-  const d = getAppData();
-  return (d.services || []).filter(s => s.status !== 'Inactive');
+export async function getTestimonials() {
+  try {
+    const res = await fetch(`${API_BASE}/testimonials/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch testimonials', e);
+  }
+  return [];
 }
 
-export function getTestimonials() {
-  const d = getAppData();
-  return d.testimonials || [];
+export async function getTeam() {
+  try {
+    const res = await fetch(`${API_BASE}/team/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch team', e);
+  }
+  return [];
 }
 
-export function getTeam() {
-  const d = getAppData();
-  return d.team || [];
+export async function getStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats/public`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch stats', e);
+  }
+  return { projects: 1, clients: 20, services: 7, satisfaction: 99 };
 }
 
-export function getStats() {
-  const d = getAppData();
-  return d.stats || defaultData.stats;
-}
-
-export function getNews() {
-  const d = getAppData();
-  return (d.news || []).filter(n => n.status === 'Published');
+export async function getNews() {
+  try {
+    const res = await fetch(`${API_BASE}/news/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data.filter(n => n.status === 'Published');
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch news', e);
+  }
+  return [];
 }
 
 /**
@@ -105,4 +128,25 @@ export async function subscribeNewsletter(email) {
     console.error('api.js: failed to subscribe to newsletter', e);
     return { success: false, message: 'Server connection failed' };
   }
+}
+
+/**
+ * Fetch global site settings from MySQL database
+ */
+export async function getSettings() {
+  try {
+    const res = await fetch(`${API_BASE}/settings/`);
+    const result = await res.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+  } catch (e) {
+    console.error('api.js: failed to fetch settings', e);
+  }
+  // Fallback defaults
+  return {
+    company_email: 'info@onetapsolution.com',
+    contact_phone: '+252 61 9586339',
+    office_location: 'Mogadishu, Somalia'
+  };
 }

@@ -52,7 +52,7 @@ const AdminServices = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Our Services</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Our Services</h1>
                     <p className="text-slate-500 text-sm font-medium mt-1">Manage the digital solutions offered to clients</p>
                 </div>
                 <button 
@@ -72,7 +72,7 @@ const AdminServices = () => {
                     placeholder="Search services by name or description..." 
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-[#0A0C10] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-[#04C244]/30 transition-all"
+                    className="w-full bg-white dark:bg-[#0A0C10] border border-black/10 dark:border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#04C244]/30 transition-all"
                 />
             </div>
 
@@ -84,21 +84,21 @@ const AdminServices = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="bg-[#0A0C10] border border-white/5 rounded-[32px] p-8 hover:border-[#04C244]/20 transition-all group relative overflow-hidden"
+                        className="bg-white dark:bg-[#0A0C10] border border-black/10 dark:border-white/5 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 hover:border-[#04C244]/20 transition-all group relative overflow-hidden"
                     >
-                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#04C244] mb-6 group-hover:bg-[#04C244] group-hover:text-black transition-all duration-500 text-2xl">
+                        <div className="w-14 h-14 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center text-[#04C244] mb-6 group-hover:bg-[#04C244] group-hover:text-black transition-all duration-500 text-2xl">
                             <i className={s.icon}></i>
                         </div>
 
-                        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#04C244] transition-colors">{s.name}</h3>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-[#04C244] transition-colors">{s.name}</h3>
                         <p className="text-sm text-slate-400 leading-relaxed mb-8 line-clamp-3">
                             {s.desc}
                         </p>
 
-                        <div className="flex items-center gap-3 pt-6 border-t border-white/5">
+                        <div className="flex items-center gap-3 pt-6 border-t border-black/10 dark:border-white/5">
                             <button 
                                 onClick={() => handleOpenModal(s)}
-                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
                             >
                                 <Edit2 size={14} />
                                 <span>Edit Service</span>
@@ -129,22 +129,22 @@ const AdminServices = () => {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-[#0A0C10] border border-white/10 rounded-[32px] w-full max-w-lg overflow-hidden relative z-10 shadow-2xl"
+                            className="bg-white dark:bg-[#0A0C10] border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-[32px] w-full max-w-lg overflow-hidden relative z-10 shadow-2xl"
                         >
-                            <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-white">{editingService ? 'Edit Service' : 'New Service'}</h2>
-                                <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-white transition-colors">
+                            <div className="p-4 sm:p-8 border-b border-black/10 dark:border-white/5 flex items-center justify-between">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{editingService ? 'Edit Service' : 'New Service'}</h2>
+                                <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
                                     <X size={24} />
                                 </button>
                             </div>
-                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                            <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Service Name</label>
                                     <input 
                                         type="text" 
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:border-[#04C244]/50 transition-all"
+                                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 px-4 text-slate-900 dark:text-white focus:outline-none focus:border-[#04C244]/50 transition-all"
                                         placeholder="e.g. Cloud Infrastructure"
                                         required
                                     />
@@ -154,7 +154,7 @@ const AdminServices = () => {
                                     <textarea 
                                         value={formData.desc}
                                         onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:border-[#04C244]/50 transition-all min-h-[120px] resize-none"
+                                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 px-4 text-slate-900 dark:text-white focus:outline-none focus:border-[#04C244]/50 transition-all min-h-[120px] resize-none"
                                         placeholder="Describe the service..."
                                         required
                                     ></textarea>
@@ -165,20 +165,20 @@ const AdminServices = () => {
                                         <select 
                                             value={formData.icon}
                                             onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:border-[#04C244]/50 transition-all appearance-none cursor-pointer"
+                                            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 px-4 text-slate-900 dark:text-white focus:outline-none focus:border-[#04C244]/50 transition-all appearance-none cursor-pointer"
                                         >
-                                            <option value="fas fa-laptop-code" className="bg-[#0A0C10] text-white">Web Development (Laptop)</option>
-                                            <option value="fas fa-mobile-alt" className="bg-[#0A0C10] text-white">Mobile Apps (Phone)</option>
-                                            <option value="fas fa-server" className="bg-[#0A0C10] text-white">Cloud Services (Server)</option>
-                                            <option value="fas fa-shield-alt" className="bg-[#0A0C10] text-white">Cyber Security (Shield)</option>
-                                            <option value="fas fa-chart-line" className="bg-[#0A0C10] text-white">Digital Marketing (Chart)</option>
-                                            <option value="fas fa-database" className="bg-[#0A0C10] text-white">Database Management (Database)</option>
-                                            <option value="fas fa-brush" className="bg-[#0A0C10] text-white">UI/UX Design (Brush)</option>
-                                            <option value="fas fa-search-dollar" className="bg-[#0A0C10] text-white">SEO Optimization (Search)</option>
-                                            <option value="fas fa-network-wired" className="bg-[#0A0C10] text-white">Network Solutions (Network)</option>
-                                            <option value="fas fa-robot" className="bg-[#0A0C10] text-white">Artificial Intelligence (Robot)</option>
-                                            <option value="fas fa-headset" className="bg-[#0A0C10] text-white">Technical Support (Headset)</option>
-                                            <option value="fas fa-tools" className="bg-[#0A0C10] text-white">Maintenance (Tools)</option>
+                                            <option value="fas fa-laptop-code" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Web Development (Laptop)</option>
+                                            <option value="fas fa-mobile-alt" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Mobile Apps (Phone)</option>
+                                            <option value="fas fa-server" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Cloud Services (Server)</option>
+                                            <option value="fas fa-shield-alt" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Cyber Security (Shield)</option>
+                                            <option value="fas fa-chart-line" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Digital Marketing (Chart)</option>
+                                            <option value="fas fa-database" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Database Management (Database)</option>
+                                            <option value="fas fa-brush" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">UI/UX Design (Brush)</option>
+                                            <option value="fas fa-search-dollar" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">SEO Optimization (Search)</option>
+                                            <option value="fas fa-network-wired" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Network Solutions (Network)</option>
+                                            <option value="fas fa-robot" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Artificial Intelligence (Robot)</option>
+                                            <option value="fas fa-headset" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Technical Support (Headset)</option>
+                                            <option value="fas fa-tools" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Maintenance (Tools)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                                             <i className={formData.icon}></i>
@@ -189,7 +189,7 @@ const AdminServices = () => {
                                     <button 
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold text-slate-400 hover:text-white transition-all"
+                                        className="flex-1 py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl text-sm font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
                                     >
                                         Cancel
                                     </button>
