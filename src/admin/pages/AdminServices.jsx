@@ -98,7 +98,7 @@ const AdminServices = () => {
                         <div className="flex items-center gap-3 pt-6 border-t border-black/10 dark:border-white/5">
                             <button 
                                 onClick={() => handleOpenModal(s)}
-                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
                             >
                                 <Edit2 size={14} />
                                 <span>Edit Service</span>
