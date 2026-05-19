@@ -1,4 +1,5 @@
 import os
+import logging
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
 
@@ -11,14 +12,24 @@ class Config:
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
     
-    # Database
-    DB_USER = os.environ.get('DB_USER', 'root')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
-    DB_HOST = os.environ.get('DB_HOST', 'localhost')
-    DB_PORT = os.environ.get('DB_PORT', '3306')
-    DB_NAME = os.environ.get('DB_NAME', 'onetap_db')
-    
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # Database — support DATABASE_URL (Render/Railway/PlanetScale) or individual vars
+    _database_url = os.environ.get('DATABASE_URL', '')
+    if _database_url:
+        # Some providers give postgres:// — ensure mysql+pymysql for MySQL URLs
+        if _database_url.startswith('mysql://'):
+            _database_url = _database_url.replace('mysql://', 'mysql+pymysql://', 1)
+        SQLALCHEMY_DATABASE_URI = _database_url
+    else:
+        DB_USER = os.environ.get('DB_USER', 'root')
+        DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
+        DB_HOST = os.environ.get('DB_HOST', 'localhost')
+        DB_PORT = os.environ.get('DB_PORT', '3306')
+        DB_NAME = os.environ.get('DB_NAME', 'onetap_db')
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}"
+            f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT Configuration
@@ -46,11 +57,10 @@ class ProductionConfig(Config):
     
     # In production, ensure secure settings
     def __init__(self):
-        # Prevent default dev keys in production and fail fast if missing
+        # Fail fast if essential secrets are missing
         try:
             self.SECRET_KEY = os.environ['SECRET_KEY']
             self.JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
-            self.DB_PASSWORD = os.environ['DB_PASSWORD']
         except KeyError as e:
             raise ValueError(f"Missing essential environment variable in production: {e}")
             
@@ -58,8 +68,14 @@ class ProductionConfig(Config):
             raise ValueError("SECRET_KEY must be configured securely in production!")
         if self.JWT_SECRET_KEY == 'jwt-dev-secret-key':
             raise ValueError("JWT_SECRET_KEY must be configured securely in production!")
-        if Config.DB_USER == 'root':
-            raise ValueError("Do not use 'root' database user in production! Use a dedicated least-privilege user.")
+        
+        # Warn if using root — don't block (some managed DBs use root by default)
+        db_user = os.environ.get('DB_USER', 'root')
+        if db_user == 'root':
+            logging.warning(
+                "WARNING: Using 'root' DB user in production. "
+                "Consider a least-privilege user for better security."
+            )
 
 config = {
     'development': DevelopmentConfig,
