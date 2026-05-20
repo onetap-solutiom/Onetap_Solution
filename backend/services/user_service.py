@@ -88,6 +88,29 @@ class UserService:
 
         db.session.add(new_user)
         db.session.commit()
+
+        # Send verification email asynchronously
+        try:
+            import os
+            import threading
+            from flask import current_app
+            from utils.email import generate_verification_token, send_verification_email
+
+            token = generate_verification_token(email)
+            backend_url = os.environ.get('BACKEND_URL', 'http://localhost:5000')
+            verification_link = f"{backend_url}/api/auth/verify-email?token={token}"
+            
+            app = current_app._get_current_object()
+            def send_async_email(app_context, user_email, user_name, link):
+                with app_context.app_context():
+                    send_verification_email(user_email, user_name, link)
+            
+            thread = threading.Thread(target=send_async_email, args=(app, email, name, verification_link))
+            thread.start()
+        except Exception as e:
+            from flask import current_app
+            current_app.logger.error(f"Failed to trigger verification email thread: {str(e)}")
+
         return new_user, "created"
 
     @staticmethod

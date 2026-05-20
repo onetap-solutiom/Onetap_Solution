@@ -100,3 +100,31 @@ def get_current_user():
         return error_response("User not found", 404)
 
     return success_response({'user': user.to_dict()})
+
+def verify_email():
+    """Verify user email address using verification token."""
+    from flask import redirect, current_app
+    from database.db import db
+    from utils.email import confirm_verification_token
+
+    token = request.args.get('token')
+    frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:5173')
+    
+    if not token:
+        return redirect(f"{frontend_url}/admin/login?verify_error=missing_token")
+        
+    email = confirm_verification_token(token)
+    if not email:
+        return redirect(f"{frontend_url}/admin/login?verify_error=invalid_or_expired")
+        
+    user = UserService.get_by_email(email)
+    if not user:
+        return redirect(f"{frontend_url}/admin/login?verify_error=user_not_found")
+        
+    if user.email_verified:
+        return redirect(f"{frontend_url}/admin/login?verified=already")
+        
+    user.email_verified = True
+    db.session.commit()
+    logger.info(f"User {user.email} email verified successfully.")
+    return redirect(f"{frontend_url}/admin/login?verified=success")
