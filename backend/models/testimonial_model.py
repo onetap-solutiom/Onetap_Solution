@@ -11,7 +11,8 @@ class Testimonial(db.Model):
     feedback = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, default=5, nullable=False)
     image = db.Column(db.String(255), nullable=True)
-    status = db.Column(db.Enum('Published', 'Draft', 'Hidden'), default='Published', nullable=False)
+    status = db.Column(db.Enum('Published', 'Draft', 'Hidden', name='testimonial_status'), default='Published', nullable=False)
+    is_featured = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):

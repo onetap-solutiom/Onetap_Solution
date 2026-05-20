@@ -23,9 +23,9 @@ def generate_schema():
     app = create_app('development')
     
     with app.app_context():
-        # Create a mock engine to generate MySQL schema
+        # Create a mock engine to generate PostgreSQL schema
         # We don't connect to a real database, just use the dialect
-        engine = create_engine('mysql+pymysql://root:@localhost/onetap_db')
+        engine = create_engine('postgresql+psycopg2://postgres:@localhost/postgres')
         
         with open(os.path.join(app.root_path, 'schema.sql'), 'w') as f:
             f.write("-- OneTap Solution Database Schema\n")

@@ -16,7 +16,7 @@ class Project(db.Model):
     client = db.Column(db.String(100), nullable=True)
     category = db.Column(db.String(100), nullable=True)
     status = db.Column(db.String(50), default='Development')
-    is_deleted = db.Column(db.Integer, default=0, nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):

@@ -2,17 +2,18 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import apiClient from './services/apiClient'
 
-// Fetch all public data from MySQL and cache to localStorage
+// Fetch all public data from database and cache to localStorage
 const bootstrapPublicData = async () => {
     try {
         const [projectsRes, servicesRes, teamRes, testimonialsRes, newsRes, statsRes] = await Promise.all([
-            fetch('http://localhost:5000/api/projects/').then(r => r.json()).catch(() => ({ success: false, data: [] })),
-            fetch('http://localhost:5000/api/services/').then(r => r.json()).catch(() => ({ success: false, data: [] })),
-            fetch('http://localhost:5000/api/team/').then(r => r.json()).catch(() => ({ success: false, data: [] })),
-            fetch('http://localhost:5000/api/testimonials/').then(r => r.json()).catch(() => ({ success: false, data: [] })),
-            fetch('http://localhost:5000/api/news/').then(r => r.json()).catch(() => ({ success: false, data: [] })),
-            fetch('http://localhost:5000/api/stats/track-visit', { method: 'POST' }).then(r => r.json()).catch(() => ({ success: false, data: { visitorCount: 1240 } }))
+            apiClient.get('/projects/').then(r => r.data).catch(() => ({ success: false, data: [] })),
+            apiClient.get('/services/').then(r => r.data).catch(() => ({ success: false, data: [] })),
+            apiClient.get('/team/').then(r => r.data).catch(() => ({ success: false, data: [] })),
+            apiClient.get('/testimonials/').then(r => r.data).catch(() => ({ success: false, data: [] })),
+            apiClient.get('/news/').then(r => r.data).catch(() => ({ success: false, data: [] })),
+            apiClient.post('/stats/track-visit').then(r => r.data).catch(() => ({ success: false, data: { visitorCount: 1240 } }))
         ]);
 
         const raw = localStorage.getItem('ots-app-data');
@@ -37,7 +38,7 @@ const bootstrapPublicData = async () => {
         localStorage.setItem('ots-app-data', JSON.stringify(updatedData));
         window.dispatchEvent(new Event('app-data-updated'));
     } catch (e) {
-        console.error("Failed to bootstrap public database data from MySQL:", e);
+        console.error("Failed to bootstrap public database data from server:", e);
     }
 };
 

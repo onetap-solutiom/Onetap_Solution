@@ -44,7 +44,7 @@ const roles = [
     }
 ];
 
-const RolePicker = ({ value, onChange }) => {
+const RolePicker = ({ value, onChange, disabled }) => {
     return (
         <div className="grid grid-cols-1 gap-3">
             {roles.map((role) => {
@@ -54,11 +54,12 @@ const RolePicker = ({ value, onChange }) => {
                 return (
                     <motion.div
                         key={role.id}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        onClick={() => onChange(role.id, role.permissions)}
+                        whileHover={disabled ? {} : { scale: 1.01 }}
+                        whileTap={disabled ? {} : { scale: 0.99 }}
+                        onClick={() => !disabled && onChange(role.id, role.permissions)}
                         className={`
-                            relative flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all
+                            relative flex items-start gap-4 p-4 rounded-2xl border transition-all
+                            ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
                             ${isSelected 
                                 ? 'bg-white/5 border-[#04C244]/50 shadow-lg shadow-[#04C244]/5' 
                                 : 'bg-white/2 border-white/5 hover:border-white/20'

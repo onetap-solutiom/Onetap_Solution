@@ -8,7 +8,7 @@ import {
 import { useAdmin } from '../context/AdminContext';
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
-    const { logout } = useAdmin();
+    const { logout, hasPermission } = useAdmin();
     const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') !== 'light');
 
     const toggleTheme = () => {
@@ -28,28 +28,53 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     const menuItems = [
         { title: 'Main Menu', type: 'header' },
         { title: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
-        { title: 'Users', path: '/admin/users', icon: <Users size={20} /> },
-        { title: 'Projects', path: '/admin/projects', icon: <Briefcase size={20} /> },
-        { title: 'Team', path: '/admin/team', icon: <UserPlus size={20} /> },
-        { title: 'Testimonials', path: '/admin/testimonials', icon: <Star size={20} /> },
-        { title: 'Messages', path: '/admin/messages', icon: <Mail size={20} />, badge: true },
+        { title: 'Users', path: '/admin/users', icon: <Users size={20} />, permission: 'view_users' },
+        { title: 'Projects', path: '/admin/projects', icon: <Briefcase size={20} />, permission: 'view_projects' },
+        { title: 'Team', path: '/admin/team', icon: <UserPlus size={20} />, permission: 'view_team' },
+        { title: 'Testimonials', path: '/admin/testimonials', icon: <Star size={20} />, permission: 'view_testimonials' },
+        { title: 'Messages', path: '/admin/messages', icon: <Mail size={20} />, badge: true, permission: 'view_contacts' },
         
         { title: 'Management', type: 'header' },
-        { title: 'Services', path: '/admin/services', icon: <Settings size={20} /> },
-        { title: 'News', path: '/admin/news', icon: <Newspaper size={20} /> },
-        { title: 'Analytics', path: '/admin/analytics', icon: <PieChart size={20} /> },
+        { title: 'Services', path: '/admin/services', icon: <Settings size={20} />, permission: 'view_services' },
+        { title: 'News', path: '/admin/news', icon: <Newspaper size={20} />, permission: 'view_news' },
+        { title: 'Analytics', path: '/admin/analytics', icon: <PieChart size={20} />, permission: 'view_logs' },
         
         { title: 'Settings', type: 'header' },
-        { title: 'General', path: '/admin/settings', icon: <Settings2 size={20} /> },
+        { title: 'General', path: '/admin/settings', icon: <Settings2 size={20} />, permission: 'manage_settings' },
     ];
+
+    // Filter menu items by permission
+    const filteredMenuItems = menuItems.filter(item => {
+        if (item.type === 'header') return true;
+        return !item.permission || hasPermission(item.permission);
+    });
+
+    // Remove empty headers
+    const finalMenuItems = [];
+    for (let i = 0; i < filteredMenuItems.length; i++) {
+        const current = filteredMenuItems[i];
+        if (current.type === 'header') {
+            let hasContent = false;
+            for (let j = i + 1; j < filteredMenuItems.length; j++) {
+                if (filteredMenuItems[j].type === 'header') break;
+                hasContent = true;
+                break;
+            }
+            if (hasContent) {
+                finalMenuItems.push(current);
+            }
+        } else {
+            finalMenuItems.push(current);
+        }
+    }
 
     return (
         <>
             {/* Mobile Overlay */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-                    onClick={toggleSidebar}
+                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                     onClick={toggleSidebar}
                 ></div>
             )}
 
@@ -69,7 +94,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                     {/* Menu */}
                     <nav className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
                         <ul className="space-y-1">
-                            {menuItems.map((item, idx) => (
+                            {finalMenuItems.map((item, idx) => (
                                 item.type === 'header' ? (
                                     <li key={idx} className="pt-4 pb-2 px-3">
                                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.title}</span>

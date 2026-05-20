@@ -1,112 +1,60 @@
 from flask import request
-from database.db import db
-from models.user_model import User, Role
+from flask_jwt_extended import get_jwt_identity
+from services.user_service import UserService
 from utils.responses import success_response, error_response
-from utils.validators import require_fields
-from utils.security import hash_password, check_password
-
-ROLE_MAPPING = {
-    'superadmin': 1,
-    'super admin': 1,
-    'admin': 2,
-    'editor': 3,
-    'employee': 4,
-    'viewer': 5
-}
 
 def get_all_users():
-    users = User.query.filter_by(is_deleted=0).all()
+    """Fetch all active users."""
+    users = UserService.get_all()
     return success_response([u.to_dict() for u in users])
 
 def create_user():
+    """Create a new user or reactivate a deleted one."""
     data = request.get_json(silent=True) or {}
-    missing = require_fields(data, ['name', 'email', 'password'])
-    
-    if missing:
-        return error_response(f"Missing required fields: {', '.join(missing)}", 400)
-        
-    email = data['email'].strip().lower()
-    name = data['name'].strip()
-    password = data['password']
-    
-    # Map role name to role_id
-    role_name = str(data.get('role', 'Admin')).strip().lower()
-    role_id = ROLE_MAPPING.get(role_name, 2) # Default to 2 (Admin)
-    
-    hashed = hash_password(password)
-    
-    # Check duplicate email globally (because email is UNIQUE in DB)
-    existing_user = User.query.filter_by(email=email).first()
-    if existing_user:
-        if existing_user.is_deleted:
-            # Reactivate soft-deleted user
-            existing_user.is_deleted = 0
-            existing_user.name = name
-            existing_user.password_hash = hashed
-            existing_user.role_id = role_id
-            existing_user.status = data.get('status', 'Active')
-            db.session.commit()
-            return success_response(existing_user.to_dict(), "User reactivated successfully", 200)
-        else:
-            return error_response("A user with this email already exists.", 409)
-    
-    new_user = User(
-        name=name,
-        email=email,
-        password_hash=hashed,
-        role_id=role_id,
-        status=data.get('status', 'Active')
-    )
-    
-    db.session.add(new_user)
-    db.session.commit()
-    
-    return success_response(new_user.to_dict(), "User created successfully", 201)
+    try:
+        new_user, action = UserService.create(data)
+        msg = "User created successfully" if action == "created" else "User reactivated successfully"
+        status = 201 if action == "created" else 200
+        return success_response(new_user.to_dict(), msg, status)
+    except ValueError as e:
+        # Conflict or Bad request
+        if "already exists" in str(e):
+            return error_response(str(e), 409)
+        return error_response(str(e), 400)
 
 def update_user(user_id):
-    user = User.query.filter_by(id=user_id, is_deleted=0).first()
-    if not user:
-        return error_response("User not found", 404)
-        
+    """Update user information."""
     data = request.get_json(silent=True) or {}
-    
-    if 'name' in data:
-        user.name = data['name'].strip()
-        
-    if 'email' in data:
-        email = data['email'].strip().lower()
-        if email != user.email:
-            existing_user = User.query.filter_by(email=email).first()
-            if existing_user:
-                return error_response("A user with this email already exists.", 409)
-            user.email = email
-            
-    if 'password' in data and data['password']:
-        # Require old password to be provided and correct
-        old_password = data.get('old_password', '')
-        if not old_password:
-            return error_response("Current password is required to set a new password.", 400)
-        if not check_password(old_password, user.password_hash):
-            return error_response("Current password is incorrect.", 401)
-        user.password_hash = hash_password(data['password'])
-        
-    if 'role' in data:
-        role_name = str(data['role']).strip().lower()
-        user.role_id = ROLE_MAPPING.get(role_name, 2)
-        
-    if 'status' in data:
-        user.status = data['status']
-        
-    db.session.commit()
-    return success_response(user.to_dict(), "User updated successfully")
+    current_user_id = get_jwt_identity()
+
+    # Guardrail: Prevent self-modification that causes lockout or loss of admin privilege
+    if str(user_id).strip().lower() == str(current_user_id).strip().lower():
+        if 'status' in data and data['status'] != 'Active':
+            return error_response("You cannot deactivate or suspend your own account.", 400)
+        if 'role' in data:
+            return error_response("You cannot change your own role.", 400)
+
+    try:
+        user = UserService.update(user_id, data)
+        if not user:
+            return error_response("User not found", 404)
+        return success_response(user.to_dict(), "User updated successfully")
+    except ValueError as e:
+        if "already exists" in str(e):
+            return error_response(str(e), 409)
+        return error_response(str(e), 400)
+    except PermissionError as e:
+        return error_response(str(e), 401)
 
 def delete_user(user_id):
-    user = User.query.filter_by(id=user_id, is_deleted=0).first()
-    if not user:
+    """Soft-delete a user."""
+    current_user_id = get_jwt_identity()
+
+    # Guardrail: Prevent self-deletion
+    if str(user_id).strip().lower() == str(current_user_id).strip().lower():
+        return error_response("You cannot delete your own account.", 400)
+
+    success = UserService.delete(user_id)
+    if not success:
         return error_response("User not found", 404)
-        
-    # Soft delete
-    user.is_deleted = 1
-    db.session.commit()
-    
     return success_response(None, "User deleted successfully")

@@ -5,7 +5,7 @@ class News(db.Model):
     __tablename__ = 'news'
     
     id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    author_id = db.Column(db.Uuid, db.ForeignKey('users.id'), nullable=True)
     title = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(220), nullable=False, unique=True)
     content = db.Column(db.Text, nullable=False)
@@ -13,10 +13,10 @@ class News(db.Model):
     image = db.Column(db.Text, nullable=True)
     category = db.Column(db.String(100), nullable=True)
     tags = db.Column(db.String(500), nullable=True) # comma-separated
-    status = db.Column(db.Enum('Published', 'Draft', 'Archived'), default='Draft', nullable=False)
-    is_featured = db.Column(db.Integer, default=0, nullable=False)
+    status = db.Column(db.Enum('Published', 'Draft', 'Archived', name='news_status'), default='Draft', nullable=False)
+    is_featured = db.Column(db.Boolean, default=False, nullable=False)
     view_count = db.Column(db.Integer, default=0, nullable=False)
-    is_deleted = db.Column(db.Integer, default=0, nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     published_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -24,7 +24,7 @@ class News(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'author_id': self.author_id,
+            'author_id': str(self.author_id) if self.author_id else None,
             'title': self.title,
             'slug': self.slug,
             'content': self.content,

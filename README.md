@@ -21,7 +21,7 @@
 
 ### Public Frontend
 - **Modern UI/UX**: Premium dark-mode aesthetic utilizing glassmorphism, dynamic micro-animations, and fully responsive layouts.
-- **Dynamic Content**: Real-time fetching of Services, Portfolios, Testimonials, and News directly from a robust Python/MySQL backend.
+- **Dynamic Content**: Real-time fetching of Services, Portfolios, Testimonials, and News directly from a robust Python/PostgreSQL (Supabase) backend.
 - **Interactive Elements**: Auto-playing carousels, animated page transitions, and engaging call-to-action sections.
 
 ### Admin Dashboard (`/admin`)
@@ -42,7 +42,7 @@
 
 ### Backend Architecture
 - **Server**: Python / Flask
-- **ORM & Database**: SQLAlchemy connecting to MySQL (via PyMySQL)
+- **ORM & Database**: SQLAlchemy connecting to PostgreSQL (via psycopg2)
 - **Security**: Werkzeug Security for advanced cryptographic hashing
 
 ---
@@ -61,13 +61,10 @@ Security is a core focus of the OneTap Solution architecture. Contributors and d
 
 ## ⚙️ Local Development Setup
 
-### 1. Database Configuration (MySQL)
-1. Ensure your MySQL server is running locally.
-2. Create an empty database (e.g., `your_database_name`).
-3. Import the initial database schema:
-   ```bash
-   mysql -u <db_user> -p <your_database_name> < backend/setup_database.sql
-   ```
+### 1. Database Configuration (Supabase / PostgreSQL)
+1. Create a Supabase project at [supabase.com](https://supabase.com).
+2. Copy the queries from [database/schema.sql](file:///d:/OTS/OTS/database/schema.sql) and [database/triggers.sql](file:///d:/OTS/OTS/database/triggers.sql) and execute them in the **SQL Editor** of the Supabase dashboard.
+3. If you want to load mock data, copy the queries from [database/seed.sql](file:///d:/OTS/OTS/database/seed.sql) and run them in the SQL Editor.
 
 ### 2. Backend Initialization (Flask)
 1. Navigate to the backend directory:
@@ -77,18 +74,23 @@ Security is a core focus of the OneTap Solution architecture. Contributors and d
 2. Set up a Python virtual environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
+   - Windows: `venv\Scripts\activate`
+   - Unix/macOS: `source venv/bin/activate`
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Configure environment variables. Create a `.env` file in the `backend` directory and add your specific secure credentials:
+4. Configure environment variables. Create a `.env` file in the `backend` directory and add your credentials:
    ```env
    FLASK_ENV=development
    FLASK_DEBUG=1
    SECRET_KEY=<generate_a_secure_random_string_here>
-   DATABASE_URI=mysql+pymysql://<db_user>:<db_password>@<db_host>/<your_database_name>
+   DB_HOST=<your_supabase_host>
+   DB_USER=postgres
+   DB_PASSWORD=<your_supabase_db_password>
+   DB_NAME=postgres
+   DB_PORT=5432
    ```
 5. Launch the backend server (default port 5000):
    ```bash

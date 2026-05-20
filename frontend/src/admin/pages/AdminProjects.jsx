@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminProjects = () => {
-    const { data, deleteFromCollection, updateCollection } = useAdmin();
+    const { data, deleteFromCollection, updateCollection, hasPermission } = useAdmin();
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
@@ -93,13 +93,15 @@ const AdminProjects = () => {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Project Portfolio</h1>
                     <p className="text-slate-500 text-sm font-medium mt-1">Manage client projects and case studies</p>
                 </div>
-                <button 
-                    onClick={() => handleOpenModal()}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#04C244] text-black rounded-xl text-sm font-bold hover:bg-[#03a837] transition-all shadow-lg shadow-[#04C244]/10"
-                >
-                    <Plus size={18} />
-                    <span>Create Project</span>
-                </button>
+                {hasPermission('create_project') && (
+                    <button 
+                        onClick={() => handleOpenModal()}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#04C244] text-black rounded-xl text-sm font-bold hover:bg-[#03a837] transition-all shadow-lg shadow-[#04C244]/10"
+                    >
+                        <Plus size={18} />
+                        <span>Create Project</span>
+                    </button>
+                )}
             </div>
 
             {/* Filters */}
@@ -178,19 +180,23 @@ const AdminProjects = () => {
                         </div>
 
                         <div className="flex items-center gap-3 pt-4 border-t border-black/10 dark:border-white/5">
-                            <button 
-                                onClick={() => handleOpenModal(p)}
-                                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
-                            >
-                                <Edit2 size={14} />
-                                <span>Edit</span>
-                            </button>
-                            <button 
-                                onClick={() => { if(confirm('Delete project?')) deleteFromCollection('projects', p.id) }}
-                                className="px-3 py-2.5 bg-red-500/5 hover:bg-red-500/10 rounded-xl text-red-500 transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
+                            {hasPermission('edit_project') && (
+                                <button 
+                                    onClick={() => handleOpenModal(p)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl text-xs font-bold text-slate-300 transition-all"
+                                >
+                                    <Edit2 size={14} />
+                                    <span>Edit</span>
+                                </button>
+                            )}
+                            {hasPermission('delete_project') && (
+                                <button 
+                                    onClick={() => { if(confirm('Delete project?')) deleteFromCollection('projects', p.id) }}
+                                    className="px-3 py-2.5 bg-red-500/5 hover:bg-red-500/10 rounded-xl text-red-500 transition-all"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
                             {p.url && (
                                 <a 
                                     href={p.url} 

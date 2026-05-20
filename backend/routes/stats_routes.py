@@ -3,6 +3,7 @@ from database.db import db
 from models.visit_model import Visit
 from utils.responses import success_response, error_response
 from datetime import datetime, timedelta
+from middleware.auth_middleware import permission_required
 
 stats_bp = Blueprint('stats', __name__)
 stats_bp.strict_slashes = False
@@ -21,11 +22,11 @@ def track_visit():
         five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
         existing = Visit.query.filter(
             Visit.ip_address == ip,
-            Visit.created_at >= five_minutes_ago
+            Visit.visited_at >= five_minutes_ago
         ).first()
         
         if not existing:
-            new_visit = Visit(ip_address=ip, user_agent=user_agent)
+            new_visit = Visit(ip_address=ip, user_agent=user_agent, page_visited=request.path or '/')
             db.session.add(new_visit)
             db.session.commit()
             
@@ -65,6 +66,7 @@ def get_public_stats():
         return error_response(f"Error getting public stats: {str(e)}", 500)
 
 @stats_bp.route('/dashboard', methods=['GET'])
+@permission_required('view_dashboard')
 def get_dashboard_stats():
     from models.user_model import User
     from models.project_model import Project
@@ -76,20 +78,20 @@ def get_dashboard_stats():
         last_month = now - timedelta(days=30)
         
         # 1. Total Users
-        total_users = User.query.filter_by(is_deleted=0).count()
-        users_this_month = User.query.filter(User.is_deleted == 0, User.created_at >= last_month).count()
+        total_users = User.query.filter_by(is_deleted=False).count()
+        users_this_month = User.query.filter(User.is_deleted == False, User.created_at >= last_month).count()
         users_before = total_users - users_this_month
         user_trend = f"+{round((users_this_month / users_before * 100) if users_before else (100 if users_this_month else 0))}%"
 
         # 2. Active Projects
-        active_projects = Project.query.filter_by(is_deleted=0, status='Live').count()
-        projects_this_month = Project.query.filter(Project.is_deleted == 0, Project.status == 'Live', Project.created_at >= last_month).count()
+        active_projects = Project.query.filter_by(is_deleted=False, status='Live').count()
+        projects_this_month = Project.query.filter(Project.is_deleted == False, Project.status == 'Live', Project.created_at >= last_month).count()
         projects_before = active_projects - projects_this_month
         project_trend = f"+{round((projects_this_month / projects_before * 100) if projects_before else (100 if projects_this_month else 0))}%"
 
         # 3. Total Visitors
         total_visitors = Visit.query.count()
-        visitors_this_month = Visit.query.filter(Visit.created_at >= last_month).count()
+        visitors_this_month = Visit.query.filter(Visit.visited_at >= last_month).count()
         visitors_before = total_visitors - visitors_this_month
         visitor_trend = f"+{round((visitors_this_month / visitors_before * 100) if visitors_before else (100 if visitors_this_month else 0))}%"
 
@@ -104,7 +106,7 @@ def get_dashboard_stats():
              sign = "+" if diff >= 0 else "-"
              message_trend = f"{sign}{round(abs(diff) / (messages_before or 1) * 100)}%"
 
-        # 5. Chart Data (Mocking reasonable distribution based on real total, since grouping by date in SQLite/MySQL differs and might crash)
+        # 5. Chart Data (Mocking reasonable distribution based on real total, since grouping by date in SQLite/PostgreSQL differs and might crash)
         # We'll just provide a simplified realistic set based on actual visitor count
         base_val = total_visitors // 100 or 10
         chart_data = {
@@ -156,6 +158,7 @@ def get_dashboard_stats():
 
 
 @stats_bp.route('/analytics', methods=['GET'])
+@permission_required('view_logs')
 def get_analytics():
     """Returns full Traffic Analytics data from the database."""
     from sqlalchemy import func, extract
@@ -166,10 +169,10 @@ def get_analytics():
 
         # ------- Total visitors & new visitors (last 30 days) -------
         total_visitors = Visit.query.count()
-        new_visitors = Visit.query.filter(Visit.created_at >= last_month).count()
+        new_visitors = Visit.query.filter(Visit.visited_at >= last_month).count()
         prev_period_new = Visit.query.filter(
-            Visit.created_at >= last_month - timedelta(days=30),
-            Visit.created_at < last_month
+            Visit.visited_at >= last_month - timedelta(days=30),
+            Visit.visited_at < last_month
         ).count()
         new_visitor_trend = round((new_visitors - prev_period_new) / (prev_period_new or 1) * 100)
         new_visitor_trend_str = f"+{new_visitor_trend}%" if new_visitor_trend >= 0 else f"{new_visitor_trend}%"
@@ -184,13 +187,13 @@ def get_analytics():
                 month_end = month_start.replace(month=m + 1)
 
             page_views = Visit.query.filter(
-                Visit.created_at >= month_start,
-                Visit.created_at < month_end
+                Visit.visited_at >= month_start,
+                Visit.visited_at < month_end
             ).count()
 
             unique_visitors = db.session.query(func.count(func.distinct(Visit.ip_address))).filter(
-                Visit.created_at >= month_start,
-                Visit.created_at < month_end
+                Visit.visited_at >= month_start,
+                Visit.visited_at < month_end
             ).scalar() or 0
 
             months_data.append({
@@ -242,6 +245,7 @@ def get_analytics():
 
 
 @stats_bp.route('/export/csv', methods=['GET'])
+@permission_required('view_logs')
 def export_visits_csv():
     """Download visit data for a custom date range as CSV."""
     from flask import make_response
@@ -253,11 +257,11 @@ def export_visits_csv():
     try:
         query = Visit.query
         if date_from:
-            query = query.filter(Visit.created_at >= f"{date_from} 00:00:00")
+            query = query.filter(Visit.visited_at >= f"{date_from} 00:00:00")
         if date_to:
-            query = query.filter(Visit.created_at <= f"{date_to} 23:59:59")
+            query = query.filter(Visit.visited_at <= f"{date_to} 23:59:59")
 
-        visits = query.order_by(Visit.created_at.desc()).all()
+        visits = query.order_by(Visit.visited_at.desc()).all()
 
         output = io.StringIO()
         writer = csv.writer(output)
@@ -267,7 +271,7 @@ def export_visits_csv():
                 v.id,
                 v.ip_address or '',
                 v.user_agent or '',
-                v.created_at.strftime('%Y-%m-%d %H:%M:%S') if v.created_at else ''
+                v.visited_at.strftime('%Y-%m-%d %H:%M:%S') if v.visited_at else ''
             ])
 
         filename = f"visits_{date_from or 'all'}_to_{date_to or 'all'}.csv"

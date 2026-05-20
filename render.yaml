@@ -24,7 +24,7 @@ services:
       - key: DB_NAME
         sync: false
       - key: DB_PORT
-        value: "3306"
+        value: "5432"
       - key: FRONTEND_URL
         sync: false                  # Set to your Render static site URL after deploy
 
@@ -34,6 +34,7 @@ services:
   - type: web
     name: onetap-frontend
     runtime: static
+    rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:

@@ -1,6 +1,6 @@
 from flask import Blueprint
 from controllers.setting_controller import get_site_settings, update_site_settings
-from middleware.auth_middleware import admin_required
+from middleware.auth_middleware import permission_required
 
 setting_bp = Blueprint('settings', __name__)
 
@@ -8,4 +8,4 @@ setting_bp = Blueprint('settings', __name__)
 setting_bp.route('/', methods=['GET'])(get_site_settings)
 
 # Admin protected route to edit settings
-setting_bp.route('/', methods=['PUT'])(admin_required()(update_site_settings))
+setting_bp.route('/', methods=['PUT'])(permission_required('manage_settings')(update_site_settings))

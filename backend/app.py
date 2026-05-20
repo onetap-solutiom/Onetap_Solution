@@ -89,9 +89,8 @@ def create_app(config_name='default'):
     
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
-        jti = jwt_payload["jti"]
-        token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
-        return token is not None
+        from services.auth_service import AuthService
+        return AuthService.is_token_blocked(jwt_payload["jti"])
     
     # Create uploads directory if it doesn't exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

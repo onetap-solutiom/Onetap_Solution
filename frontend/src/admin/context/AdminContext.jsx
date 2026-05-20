@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
+import apiClient from '../../services/apiClient';
 
 const AdminContext = createContext();
 
@@ -24,13 +25,13 @@ const defaultData = {
 };
 
 const COLLECTION_APIS = {
-    users: 'http://localhost:5000/api/users/',
-    projects: 'http://localhost:5000/api/projects/',
-    services: 'http://localhost:5000/api/services/',
-    team: 'http://localhost:5000/api/team/',
-    testimonials: 'http://localhost:5000/api/testimonials/',
-    news: 'http://localhost:5000/api/news/',
-    messages: 'http://localhost:5000/api/contact/'
+    users: '/users/',
+    projects: '/projects/',
+    services: '/services/',
+    team: '/team/',
+    testimonials: '/testimonials/',
+    news: '/news/',
+    messages: '/contact/'
 };
 
 export const AdminProvider = ({ children }) => {
@@ -54,6 +55,32 @@ export const AdminProvider = ({ children }) => {
         }
     });
 
+    // Listen to token refresh and auto-logout events from the apiClient layer
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            setUser(null);
+            localStorage.removeItem(SESSION_KEY);
+        };
+        const handleSessionRefreshed = () => {
+            try {
+                const sessionStr = localStorage.getItem(SESSION_KEY);
+                if (sessionStr) {
+                    setUser(JSON.parse(sessionStr));
+                }
+            } catch (e) {
+                console.error("Syncing session on refresh failed:", e);
+            }
+        };
+
+        window.addEventListener('ots-unauthorized', handleUnauthorized);
+        window.addEventListener('ots-session-refreshed', handleSessionRefreshed);
+
+        return () => {
+            window.removeEventListener('ots-unauthorized', handleUnauthorized);
+            window.removeEventListener('ots-session-refreshed', handleSessionRefreshed);
+        };
+    }, []);
+
     useEffect(() => {
         localStorage.setItem(APP_DATA_KEY, JSON.stringify(data));
         window.dispatchEvent(new Event('app-data-updated'));
@@ -64,19 +91,18 @@ export const AdminProvider = ({ children }) => {
         const cleanPassword = password.trim();
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: cleanEmail, password: cleanPassword })
+            const response = await apiClient.post('/auth/login', {
+                email: cleanEmail,
+                password: cleanPassword
             });
 
-            const result = await response.json();
+            const result = response.data;
 
-            if (!response.ok || !result.success) {
+            if (!result.success || !result.data) {
                 return { success: false, message: result.message || 'Invalid email or password' };
             }
 
-            const { token, user: apiUser } = result.data;
+            const { token, refresh_token, user: apiUser } = result.data;
 
             const sessionData = {
                 id:          apiUser.id,
@@ -87,6 +113,7 @@ export const AdminProvider = ({ children }) => {
                 avatar:      apiUser.avatar || null,
                 permissions: apiUser.permissions || ['all'],
                 token:       token,
+                refresh_token: refresh_token,
                 time:        Date.now()
             };
 
@@ -96,14 +123,26 @@ export const AdminProvider = ({ children }) => {
 
         } catch (err) {
             console.error('Login API error:', err);
-            return { success: false, message: 'Cannot connect to server. Make sure the backend is running.' };
+            const errMsg = err.response?.data?.message || 'Cannot connect to server. Make sure the backend is running.';
+            return { success: false, message: errMsg };
+        }
+    };
+
+    const logout = async () => {
+        try {
+            // Attempt to inform backend of token revocation (optional)
+            await apiClient.post('/auth/logout');
+        } catch (err) {
+            console.error('Backend logout notification error:', err);
+        } finally {
+            setUser(null);
+            localStorage.removeItem(SESSION_KEY);
         }
     };
 
     useEffect(() => {
         const fetchAllData = async () => {
             if (!user?.token) return;
-            const headers = { 'Authorization': `Bearer ${user.token}` };
             
             try {
                 const [
@@ -116,14 +155,14 @@ export const AdminProvider = ({ children }) => {
                     newsRes,
                     statsRes
                 ] = await Promise.all([
-                    fetch(COLLECTION_APIS.users, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.projects, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.services, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.team, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.testimonials, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.messages, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch(COLLECTION_APIS.news, { headers }).then(r => r.json()).catch(() => ({ success: false, data: [] })),
-                    fetch('http://localhost:5000/api/stats/dashboard', { headers }).then(r => r.json()).catch(() => ({ success: false, data: null }))
+                    apiClient.get(COLLECTION_APIS.users).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.projects).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.services).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.team).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.testimonials).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.messages).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get(COLLECTION_APIS.news).then(r => r.data).catch(() => ({ success: false, data: [] })),
+                    apiClient.get('/stats/dashboard').then(r => r.data).catch(() => ({ success: false, data: null }))
                 ]);
 
                 setData(prev => {
@@ -156,7 +195,7 @@ export const AdminProvider = ({ children }) => {
                     };
                 });
             } catch (err) {
-                console.error("Failed to load dashboard data from MySQL:", err);
+                console.error("Failed to load dashboard data from database:", err);
             }
         };
         fetchAllData();
@@ -168,11 +207,6 @@ export const AdminProvider = ({ children }) => {
         return user.permissions?.includes(permission);
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem(SESSION_KEY);
-    };
-
     const updateCollection = async (key, newItem, id = null) => {
         const apiUrl = COLLECTION_APIS[key];
         
@@ -180,19 +214,16 @@ export const AdminProvider = ({ children }) => {
             if (!user?.token) return { success: false, message: "Unauthorized" };
             try {
                 const url = id ? `${apiUrl}${id}` : apiUrl;
-                const method = id ? 'PUT' : 'POST';
+                let response;
+
+                if (id) {
+                    response = await apiClient.put(url, newItem);
+                } else {
+                    response = await apiClient.post(url, newItem);
+                }
                 
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user.token}`
-                    },
-                    body: JSON.stringify(newItem)
-                });
-                
-                const result = await response.json();
-                if (response.ok && result.success) {
+                const result = response.data;
+                if (response.status >= 200 && response.status < 300 && result.success) {
                     setData(prev => {
                         const collection = prev[key] || [];
                         let newCollection;
@@ -219,8 +250,9 @@ export const AdminProvider = ({ children }) => {
                 }
             } catch (err) {
                 console.error(`Error saving ${key}:`, err);
-                alert(`Cannot connect to server. ${key} not saved.`);
-                return { success: false, message: 'Server connection failed' };
+                const errMsg = err.response?.data?.message || `Cannot connect to server. ${key} not saved.`;
+                alert(errMsg);
+                return { success: false, message: errMsg };
             }
         }
 
@@ -231,7 +263,7 @@ export const AdminProvider = ({ children }) => {
             if (id) {
                 newCollection = collection.map(item => item.id === id ? { ...item, ...newItem } : item);
             } else {
-                newCollection = [...collection, { ...newItem, id: Date.now() }];
+                newCollection = [...collection, { ...newItem, id: String(Date.now()) }];
             }
             return { ...prev, [key]: newCollection };
         });
@@ -244,14 +276,9 @@ export const AdminProvider = ({ children }) => {
         if (apiUrl) {
             if (!user?.token) return { success: false, message: "Unauthorized" };
             try {
-                const response = await fetch(`${apiUrl}${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`
-                    }
-                });
-                const result = await response.json();
-                if (response.ok && result.success) {
+                const response = await apiClient.delete(`${apiUrl}${id}`);
+                const result = response.data;
+                if (response.status >= 200 && response.status < 300 && result.success) {
                     setData(prev => {
                         const newCollection = (prev[key] || []).filter(item => item.id !== id);
                         
@@ -272,8 +299,9 @@ export const AdminProvider = ({ children }) => {
                 }
             } catch (err) {
                 console.error(`Error deleting ${key}:`, err);
-                alert(`Cannot connect to server. ${key} not deleted.`);
-                return { success: false, message: 'Server connection failed' };
+                const errMsg = err.response?.data?.message || `Cannot connect to server. ${key} not deleted.`;
+                alert(errMsg);
+                return { success: false, message: errMsg };
             }
         }
 

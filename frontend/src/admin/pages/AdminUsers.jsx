@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import RolePicker from '../components/RolePicker';
 
 const AdminUsers = () => {
-    const { data, deleteFromCollection, updateCollection } = useAdmin();
+    const { data, deleteFromCollection, updateCollection, user } = useAdmin();
     const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
@@ -161,12 +161,19 @@ const AdminUsers = () => {
                                             >
                                                 <Edit2 size={16} />
                                             </button>
-                                            <button 
-                                                onClick={() => { if(confirm('Are you sure you want to delete this user?')) deleteFromCollection('users', u.id) }}
-                                                className="p-2 bg-black/5 dark:bg-white/5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            {u.id !== user?.id ? (
+                                                <button 
+                                                    onClick={() => { if(confirm('Are you sure you want to delete this user?')) deleteFromCollection('users', u.id) }}
+                                                    className="p-2 bg-black/5 dark:bg-white/5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            ) : (
+                                                <div className="p-2 text-slate-500 text-xs font-bold select-none cursor-default bg-black/5 dark:bg-white/5 rounded-lg inline-flex items-center gap-1">
+                                                    <Lock size={12} />
+                                                    <span>Self</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                 </motion.tr>
@@ -255,16 +262,20 @@ const AdminUsers = () => {
                                                 Account Status
                                             </label>
                                             <div className="flex items-center gap-2 p-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl">
-                                                {['Active', 'Offline'].map((status) => (
-                                                    <button
-                                                        key={status}
-                                                        type="button"
-                                                        onClick={() => setFormData({ ...formData, status })}
-                                                        className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-xl transition-all ${formData.status === status ? 'bg-[#04C244] text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-                                                    >
-                                                        {status}
-                                                    </button>
-                                                ))}
+                                                {['Active', 'Offline'].map((status) => {
+                                                    const isSelf = editingUser?.id === user?.id;
+                                                    return (
+                                                        <button
+                                                            key={status}
+                                                            type="button"
+                                                            disabled={isSelf}
+                                                            onClick={() => !isSelf && setFormData({ ...formData, status })}
+                                                            className={`flex-1 py-2 text-[10px] font-bold uppercase rounded-xl transition-all ${formData.status === status ? 'bg-[#04C244] text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'} ${isSelf ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        >
+                                                            {status}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -276,6 +287,7 @@ const AdminUsers = () => {
                                     <RolePicker 
                                         value={formData.role} 
                                         onChange={handleRoleChange} 
+                                        disabled={editingUser?.id === user?.id}
                                     />
                                 </div>
 

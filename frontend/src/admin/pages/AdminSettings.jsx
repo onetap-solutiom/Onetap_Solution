@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import apiClient from '../../services/apiClient';
 import { useAdmin } from '../context/AdminContext';
 import { 
     Globe, Shield, Bell, 
@@ -35,12 +36,12 @@ const AdminSettings = () => {
     const [servicesProvided, setServicesProvided] = useState(2);
     const [satisfactionRate, setSatisfactionRate] = useState(3);
 
-    // Fetch site settings from MySQL database on mount
+    // Fetch site settings from database on mount
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/settings/');
-                const result = await res.json();
+                const res = await apiClient.get('/settings/');
+                const result = res.data;
                 if (result.success && result.data) {
                     setCompanyEmail(result.data.company_email);
                     setContactPhone(result.data.contact_phone);
@@ -97,24 +98,17 @@ const AdminSettings = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const res = await fetch('http://localhost:5000/api/settings/', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                },
-                body: JSON.stringify({
-                    company_email: companyEmail,
-                    contact_phone: contactPhone,
-                    office_location: officeLocation,
-                    projects_done: Number(projectsDone),
-                    trusted_partners: Number(trustedPartners),
-                    services_provided: Number(servicesProvided),
-                    satisfaction_rate: Number(satisfactionRate)
-                })
+            const res = await apiClient.put('/settings/', {
+                company_email: companyEmail,
+                contact_phone: contactPhone,
+                office_location: officeLocation,
+                projects_done: Number(projectsDone),
+                trusted_partners: Number(trustedPartners),
+                services_provided: Number(servicesProvided),
+                satisfaction_rate: Number(satisfactionRate)
             });
-            const result = await res.json();
-            if (res.ok && result.success) {
+            const result = res.data;
+            if (result.success) {
                 // Settings saved successfully
                 window.dispatchEvent(new Event('app-settings-updated'));
             } else {
