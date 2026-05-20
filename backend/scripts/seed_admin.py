@@ -33,7 +33,8 @@ def seed_admin():
             name='OneTap Admin',
             email=admin_email,
             password_hash=hashed_password,
-            role='Super Admin'
+            role='Super Admin',
+            email_verified=True   # SuperAdmin is pre-verified
         )
         
         db.session.add(admin_user)

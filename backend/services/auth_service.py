@@ -19,6 +19,10 @@ class AuthService:
         if user.role_slug not in ('superadmin', 'admin', 'editor', 'employee', 'viewer'):
             return None, "Admin access required"
 
+        # Enforce email verification (exempting SuperAdmin to prevent accidental lockout)
+        if not user.email_verified and user.role_slug != 'superadmin':
+            return None, "Email not verified. Please check your inbox to verify your email."
+
         # Update last login info
         user.last_login_at = datetime.now(timezone.utc)
         if ip_address:
