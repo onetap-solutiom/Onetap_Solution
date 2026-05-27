@@ -5,10 +5,14 @@
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "build": "npm install --prefix frontend && npm run build --prefix frontend",
-    "preview": "npm run preview --prefix frontend",
-    "backend": ".\\backend\\venv\\Scripts\\python.exe backend/app.py"
+    "preview": "wrangler dev",
+    "backend": ".\\backend\\venv\\Scripts\\python.exe backend/app.py",
+    "deploy": "wrangler deploy"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "wrangler": "^4.95.0"
+  }
 }
