@@ -30,12 +30,11 @@ services:
   # ─────────────────────────────────────────────
   # FRONTEND — React / Vite (Static Site)
   # ─────────────────────────────────────────────
-  - type: web
+  - type: static
     name: onetap-frontend
-    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    publishDir: dist
     envVars:
       - key: VITE_API_URL
         sync: false                  # Set to your onetap-backend Render URL
