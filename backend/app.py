@@ -75,9 +75,9 @@ def create_app(config_name='default'):
     
     # Auto-create tables (e.g. visits)
     with app.app_context():
-        db.create_all()
-        # Add new columns to tables if they don't exist
         try:
+            db.create_all()
+            # Add new columns to tables if they don't exist
             from sqlalchemy import text
             # 1. Settings Table
             for col, col_type in [
@@ -92,7 +92,7 @@ def create_app(config_name='default'):
                 except Exception:
                     db.session.rollback()
         except Exception as e:
-            app.logger.warning(f"Auto-migration warning: {e}")
+            app.logger.error(f"Database initialization error (app will still try to start): {e}")
     
     # Initialize JWT
     jwt = JWTManager(app)
