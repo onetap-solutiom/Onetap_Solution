@@ -91,8 +91,6 @@ def create_app(config_name='default'):
                     db.session.commit()
                 except Exception:
                     db.session.rollback()
-            
-                    db.session.rollback()
         except Exception as e:
             app.logger.warning(f"Auto-migration warning: {e}")
     
