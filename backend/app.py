@@ -34,10 +34,20 @@ from models.token_blocklist import TokenBlocklist
 def create_app(config_name='default'):
     """Factory function to create and configure the Flask app."""
     # Configure logging
+    log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'security.log')
+    handlers = [logging.StreamHandler()] # Always log to stdout for Render
+    
+    try:
+        # Also try logging to file if possible
+        file_handler = logging.FileHandler(log_file)
+        handlers.append(file_handler)
+    except Exception:
+        pass
+
     logging.basicConfig(
-        filename=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'security.log'),
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
     )
     
     app = Flask(__name__)
