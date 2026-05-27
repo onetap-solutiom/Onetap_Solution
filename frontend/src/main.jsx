@@ -40,6 +40,18 @@ const bootstrapPublicData = async () => {
     }
 };
 
+// Keep backend alive (prevents Render free tier from sleeping)
+const keepBackendAlive = () => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${API_URL}/api/health`)
+        .then(() => console.log('[KeepAlive] Backend is awake.'))
+        .catch(() => console.warn('[KeepAlive] Backend ping failed, it may be waking up...'));
+};
+
+// Ping immediately on load, then every 10 minutes
+keepBackendAlive();
+setInterval(keepBackendAlive, 10 * 60 * 1000);
+
 // Initiate dynamic backend synchronization
 bootstrapPublicData();
 
