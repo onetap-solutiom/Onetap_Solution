@@ -81,7 +81,7 @@ class User(db.Model):
                     'view_news', 'create_news', 'edit_news', 'delete_news', 'publish_news',
                     'view_services', 'manage_services', 'view_team', 'manage_team',
                     'view_testimonials', 'manage_testimonials', 'view_contacts', 'reply_contacts',
-                    'manage_newsletter'
+                    'manage_newsletter', 'view_logs', 'view_analytics'
                 ],
                 'editor': [
                     'view_dashboard', 'view_projects', 'create_project', 'edit_project',

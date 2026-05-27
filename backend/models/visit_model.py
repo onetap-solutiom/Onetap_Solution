@@ -6,16 +6,15 @@ class Visit(db.Model):
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip_address = db.Column(db.String(45), nullable=False)
-    user_agent = db.Column(db.String(500), nullable=True)
-    page_visited = db.Column(db.String(255), default='/', nullable=False)
+    user_agent = db.Column(db.String(500))
+    page_visited = db.Column(db.String(255), nullable=False, default='/')
     visited_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    def __init__(self, ip_address: str, user_agent: str = None, page_visited: str = '/', **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, ip_address, user_agent=None, page_visited='/'):
         self.ip_address = ip_address
         self.user_agent = user_agent
         self.page_visited = page_visited
-    
+
     def to_dict(self):
         return {
             'id': self.id,

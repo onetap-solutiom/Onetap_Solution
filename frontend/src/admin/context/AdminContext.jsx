@@ -16,7 +16,6 @@ const defaultData = {
     },
     users: [],
     projects: [],
-    visitorCount: 1240,
     services: [],
     messages: [],
     news: [],
@@ -152,8 +151,7 @@ export const AdminProvider = ({ children }) => {
                     teamRes,
                     testimonialsRes,
                     messagesRes,
-                    newsRes,
-                    statsRes
+                    newsRes
                 ] = await Promise.all([
                     apiClient.get(COLLECTION_APIS.users).then(r => r.data).catch(() => ({ success: false, data: [] })),
                     apiClient.get(COLLECTION_APIS.projects).then(r => r.data).catch(() => ({ success: false, data: [] })),
@@ -161,8 +159,7 @@ export const AdminProvider = ({ children }) => {
                     apiClient.get(COLLECTION_APIS.team).then(r => r.data).catch(() => ({ success: false, data: [] })),
                     apiClient.get(COLLECTION_APIS.testimonials).then(r => r.data).catch(() => ({ success: false, data: [] })),
                     apiClient.get(COLLECTION_APIS.messages).then(r => r.data).catch(() => ({ success: false, data: [] })),
-                    apiClient.get(COLLECTION_APIS.news).then(r => r.data).catch(() => ({ success: false, data: [] })),
-                    apiClient.get('/stats/dashboard').then(r => r.data).catch(() => ({ success: false, data: null }))
+                    apiClient.get(COLLECTION_APIS.news).then(r => r.data).catch(() => ({ success: false, data: [] }))
                 ]);
 
                 setData(prev => {
@@ -173,7 +170,6 @@ export const AdminProvider = ({ children }) => {
                     const test = testimonialsRes.success ? testimonialsRes.data : prev.testimonials;
                     const msg = messagesRes.success ? messagesRes.data : prev.messages;
                     const news = newsRes.success ? newsRes.data : prev.news;
-                    const dashboardStats = statsRes.success && statsRes.data ? statsRes.data : prev.dashboardStats;
 
                     return {
                         ...prev,
@@ -184,8 +180,6 @@ export const AdminProvider = ({ children }) => {
                         testimonials: test,
                         messages: msg,
                         news: news,
-                        visitorCount: dashboardStats?.stats?.visitors?.value || prev.visitorCount,
-                        dashboardStats: dashboardStats,
                         stats: {
                             projects: p.length,
                             clients: 20,

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { 
     LayoutDashboard, Users, Briefcase, UserPlus, Star, 
-    Mail, Settings, Newspaper, PieChart, LogOut, X, 
+    Mail, Settings, Newspaper, LogOut, X, 
     Settings2, Moon, Sun
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
@@ -30,14 +30,13 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         { title: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
         { title: 'Users', path: '/admin/users', icon: <Users size={20} />, permission: 'view_users' },
         { title: 'Projects', path: '/admin/projects', icon: <Briefcase size={20} />, permission: 'view_projects' },
-        { title: 'Team', path: '/admin/team', icon: <UserPlus size={20} />, permission: 'view_team' },
+        { title: 'Team Management', path: '/admin/team', icon: <UserPlus size={20} />, permission: 'view_team' },
         { title: 'Testimonials', path: '/admin/testimonials', icon: <Star size={20} />, permission: 'view_testimonials' },
         { title: 'Messages', path: '/admin/messages', icon: <Mail size={20} />, badge: true, permission: 'view_contacts' },
         
         { title: 'Management', type: 'header' },
         { title: 'Services', path: '/admin/services', icon: <Settings size={20} />, permission: 'view_services' },
         { title: 'News', path: '/admin/news', icon: <Newspaper size={20} />, permission: 'view_news' },
-        { title: 'Analytics', path: '/admin/analytics', icon: <PieChart size={20} />, permission: 'view_logs' },
         
         { title: 'Settings', type: 'header' },
         { title: 'General', path: '/admin/settings', icon: <Settings2 size={20} />, permission: 'manage_settings' },

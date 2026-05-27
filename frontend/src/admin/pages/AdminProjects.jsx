@@ -270,9 +270,19 @@ const AdminProjects = () => {
                                             className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl py-3 px-4 text-slate-900 dark:text-white focus:outline-none focus:border-[#04C244]/50 transition-all appearance-none"
                                         >
                                             <option value="Web Development" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Web Development</option>
-                                            <option value="Mobile App" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Mobile App</option>
+                                            <option value="Mobile Application" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Mobile Application</option>
+                                            <option value="UI/UX Design" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">UI/UX Design</option>
+                                            <option value="Graphic Design" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Graphic Design</option>
+                                            <option value="Desktop Application" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Desktop Application</option>
+                                            <option value="Digital Marketing" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Digital Marketing</option>
+                                            <option value="Artificial Intelligence" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Artificial Intelligence</option>
+                                            <option value="Cloud Solutions" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Cloud Solutions</option>
+                                            <option value="E-commerce" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">E-commerce</option>
+                                            <option value="Cybersecurity" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Cybersecurity</option>
+                                            <option value="Data Analytics" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Data Analytics</option>
                                             <option value="Business Automation" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Business Automation</option>
                                             <option value="Multimedia" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Multimedia</option>
+                                            <option value="Other" className="bg-slate-50 dark:bg-[#0A0C10] text-slate-900 dark:text-white">Other</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2">

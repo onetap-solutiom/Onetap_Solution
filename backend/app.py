@@ -25,9 +25,8 @@ from routes.testimonial_routes import testimonial_bp
 from routes.newsletter_routes import newsletter_bp
 from routes.user_routes import user_bp
 from routes.news_routes import news_bp
-from routes.stats_routes import stats_bp
 from routes.setting_routes import setting_bp
-from models.visit_model import Visit
+from routes.stats_routes import stats_bp
 from models.setting_model import Setting
 from models.token_blocklist import TokenBlocklist
 
@@ -67,9 +66,10 @@ def create_app(config_name='default'):
     # Auto-create tables (e.g. visits)
     with app.app_context():
         db.create_all()
-        # Add new columns to settings table if they don't exist
+        # Add new columns to tables if they don't exist
         try:
             from sqlalchemy import text
+            # 1. Settings Table
             for col, col_type in [
                 ('projects_done', 'INTEGER NOT NULL DEFAULT 1'),
                 ('trusted_partners', 'INTEGER NOT NULL DEFAULT 20'),
@@ -80,7 +80,9 @@ def create_app(config_name='default'):
                     db.session.execute(text(f"ALTER TABLE settings ADD COLUMN {col} {col_type}"))
                     db.session.commit()
                 except Exception:
-                    db.session.rollback()  # Column probably already exists
+                    db.session.rollback()
+            
+                    db.session.rollback()
         except Exception as e:
             app.logger.warning(f"Auto-migration warning: {e}")
     
@@ -108,8 +110,8 @@ def create_app(config_name='default'):
     app.register_blueprint(newsletter_bp, url_prefix='/api/newsletter')
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(news_bp, url_prefix='/api/news')
-    app.register_blueprint(stats_bp, url_prefix='/api/stats')
     app.register_blueprint(setting_bp, url_prefix='/api/settings')
+    app.register_blueprint(stats_bp, url_prefix='/api/stats')
     
     # Health check route
     @app.route('/api/health', methods=['GET'])

@@ -7,13 +7,12 @@ import apiClient from './services/apiClient'
 // Fetch all public data from database and cache to localStorage
 const bootstrapPublicData = async () => {
     try {
-        const [projectsRes, servicesRes, teamRes, testimonialsRes, newsRes, statsRes] = await Promise.all([
+        const [projectsRes, servicesRes, teamRes, testimonialsRes, newsRes] = await Promise.all([
             apiClient.get('/projects/').then(r => r.data).catch(() => ({ success: false, data: [] })),
             apiClient.get('/services/').then(r => r.data).catch(() => ({ success: false, data: [] })),
             apiClient.get('/team/').then(r => r.data).catch(() => ({ success: false, data: [] })),
             apiClient.get('/testimonials/').then(r => r.data).catch(() => ({ success: false, data: [] })),
             apiClient.get('/news/').then(r => r.data).catch(() => ({ success: false, data: [] })),
-            apiClient.post('/stats/track-visit').then(r => r.data).catch(() => ({ success: false, data: { visitorCount: 1240 } }))
         ]);
 
         const raw = localStorage.getItem('ots-app-data');
@@ -26,7 +25,6 @@ const bootstrapPublicData = async () => {
             team: teamRes.success ? teamRes.data : (currentData.team || []),
             testimonials: testimonialsRes.success ? testimonialsRes.data : (currentData.testimonials || []),
             news: newsRes.success ? newsRes.data : (currentData.news || []),
-            visitorCount: statsRes.success && statsRes.data ? statsRes.data.visitorCount : (currentData.visitorCount || 1240),
             stats: {
                 projects: projectsRes.success ? projectsRes.data.length : (currentData.stats?.projects || 0),
                 clients: 20,

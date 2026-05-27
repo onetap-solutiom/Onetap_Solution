@@ -102,7 +102,7 @@ const Navbar = () => {
           </NavLink>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             <ul className="flex gap-6">
               {navLinks.map((link) => (
                 <li key={link.name}>
@@ -143,7 +143,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Toggle Button */}
-          <div className="md:hidden flex items-center gap-3">
+          <div className="lg:hidden flex items-center gap-3">
             <motion.button
               onClick={toggleTheme}
               whileTap={{ scale: 0.85 }}
@@ -168,7 +168,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-55 md:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-55 lg:hidden"
             />
 
             {/* Sliding Drawer Container */}
@@ -177,7 +177,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[380px] bg-white dark:bg-zinc-950 z-60 p-6 flex flex-col shadow-2xl border-l border-slate-200 dark:border-zinc-800 md:hidden"
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[380px] bg-white dark:bg-zinc-950 z-60 p-6 flex flex-col shadow-2xl border-l border-slate-200 dark:border-zinc-800 lg:hidden"
             >
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-zinc-900">

@@ -27,8 +27,7 @@ const PortfolioPage = () => {
     };
   }, []);
 
-  const defaultCategories = ['Web', 'Design', 'UI/UX'];
-  const dynamicCategories = ['All', ...new Set([...defaultCategories, ...projectsList.map(p => p.category).filter(Boolean)])];
+  const dynamicCategories = ['All', ...new Set(projectsList.map(p => p.category).filter(Boolean))];
 
   const filtered = activeCategory === 'All'
     ? projectsList

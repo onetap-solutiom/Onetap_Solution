@@ -23,7 +23,7 @@ import AdminTeam from '../admin/pages/AdminTeam';
 import AdminTestimonials from '../admin/pages/AdminTestimonials';
 import AdminNews from '../admin/pages/AdminNews';
 import AdminSettings from '../admin/pages/AdminSettings';
-import AdminAnalytics from '../admin/pages/AdminAnalytics';
+
 
 const AdminWrapper = () => (
   <AdminProvider>
@@ -61,7 +61,7 @@ const AppRoutes = () => {
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="settings" element={<RoleGuard requiredPermission="all"><AdminSettings /></RoleGuard>} />
-            <Route path="analytics" element={<AdminAnalytics />} />
+
             
             {/* Catch-all for modules in progress */}
             <Route path="*" element={
