@@ -121,6 +121,16 @@ def create_app(config_name='default'):
     app.register_blueprint(setting_bp, url_prefix='/api/settings')
     app.register_blueprint(stats_bp, url_prefix='/api/stats')
     
+    # Root route to prevent 404 on backend home
+    @app.route('/', methods=['GET'])
+    def index():
+        return {
+            "success": True, 
+            "message": "OneTap Solution API is running successfully.",
+            "version": "1.1.0",
+            "status": "active"
+        }, 200
+
     # Health check route
     @app.route('/api/health', methods=['GET'])
     def health_check():
