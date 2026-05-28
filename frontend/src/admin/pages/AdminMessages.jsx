@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminMessages = () => {
     const { data, deleteFromCollection, setData, user } = useAdmin();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const [search, setSearch] = useState('');
     const [selectedMessage, setSelectedMessage] = useState(null);
     
@@ -26,7 +27,7 @@ const AdminMessages = () => {
     const fetchSubscribers = async () => {
         if (!user?.token) return;
         try {
-            const res = await fetch('http://localhost:5000/api/newsletter/', {
+            const res = await fetch(`${API_URL}/api/newsletter/`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const result = await res.json();
@@ -47,7 +48,7 @@ const AdminMessages = () => {
     const handleDeleteSubscriber = async (id) => {
         if (!confirm('Are you sure you want to delete this subscriber?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/newsletter/${id}`, {
+            const res = await fetch(`${API_URL}/api/newsletter/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
@@ -84,7 +85,7 @@ const AdminMessages = () => {
 
         if (!user?.token) return;
         try {
-            await fetch(`http://localhost:5000/api/contact/${id}/read`, {
+            await fetch(`${API_URL}/api/contact/${id}/read`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${user.token}`
