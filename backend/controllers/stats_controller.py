@@ -129,6 +129,27 @@ def get_system_stats():
         print(traceback.format_exc())
         return jsonify({"success": False, "message": str(e)}), 500
 
+def get_public_stats():
+    """
+    Returns simple counts for the public website stats section
+    """
+    try:
+        total_projects = Project.query.filter_by(is_deleted=False).count()
+        total_services = Service.query.filter_by(is_deleted=False).count()
+        
+        # Hardcoded or dynamic counts for clients and satisfaction
+        return jsonify({
+            "success": True,
+            "data": {
+                "projects": total_projects,
+                "clients": 20, # Can be made dynamic later
+                "services": total_services,
+                "satisfaction": 99
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 def track_visit(ip, agent, page):
     """
     Helper to record a visit

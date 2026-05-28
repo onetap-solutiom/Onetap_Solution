@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.stats_controller import get_system_stats, track_visit
+from controllers.stats_controller import get_system_stats, track_visit, get_public_stats
 from middleware.auth_middleware import permission_required
 
 stats_bp = Blueprint('stats', __name__)
@@ -8,6 +8,10 @@ stats_bp = Blueprint('stats', __name__)
 @permission_required('view_dashboard')
 def get_stats():
     return get_system_stats()
+
+@stats_bp.route('/public', methods=['GET'])
+def public_stats():
+    return get_public_stats()
 
 @stats_bp.route('/track', methods=['POST'])
 def record_visit():
