@@ -9,19 +9,25 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          // Axios HTTP client
-          'vendor-axios': ['axios'],
-          // Supabase
-          'vendor-supabase': ['@supabase/supabase-js'],
-          // Animations
-          'vendor-motion': ['framer-motion'],
-          // Icons
-          'vendor-icons': ['lucide-react'],
-          // PDF generation (heavy — load separately)
-          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@supabase')) {
+              return 'vendor-supabase';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('jspdf') || id.includes('html2canvas')) {
+              return 'vendor-pdf';
+            }
+            return 'vendor'; // everything else in node_modules
+          }
         }
       }
     }
