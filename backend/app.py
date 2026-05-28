@@ -55,11 +55,13 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    # Initialize CORS
-    origins = app.config.get('FRONTEND_URL', '*')
-    if config_name == 'production' and origins == '*':
+    # Initialize CORS — support comma-separated list of origins
+    raw_origins = app.config.get('FRONTEND_URL', '*')
+    if config_name == 'production' and (not raw_origins or raw_origins == '*'):
         raise ValueError("FRONTEND_URL must be strictly defined in production!")
-    CORS(app, resources={r"/api/*": {"origins": origins}})
+    # Split by comma to allow multiple origins (e.g. Vercel URL + localhost)
+    origins = [o.strip() for o in raw_origins.split(',')] if ',' in str(raw_origins) else raw_origins
+    CORS(app, resources={r"/api/*": {"origins": origins}}, supports_credentials=True)
     
     # Initialize Talisman for security headers
     is_prod = config_name == 'production'
