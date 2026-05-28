@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminMessages = () => {
     const { data, deleteFromCollection, setData, user } = useAdmin();
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://onetap-solution-gjw9.onrender.com';
     const [search, setSearch] = useState('');
     const [selectedMessage, setSelectedMessage] = useState(null);
     

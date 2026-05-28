@@ -42,7 +42,7 @@ const bootstrapPublicData = async () => {
 
 // Keep backend alive (prevents Render free tier from sleeping)
 const keepBackendAlive = () => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://onetap-solution-gjw9.onrender.com';
     fetch(`${API_URL}/api/health`)
         .then(() => console.log('[KeepAlive] Backend is awake.'))
         .catch(() => console.warn('[KeepAlive] Backend ping failed, it may be waking up...'));

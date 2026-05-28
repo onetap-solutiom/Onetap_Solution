@@ -7,7 +7,7 @@ const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState('idle'); // idle, sending, success, error
   const [settings, setSettings] = useState({
-    company_email: 'hello@onetapsolution.com',
+    company_email: 'onetapsolution6@gmail.com',
     contact_phone: '+252 61 9586339',
     office_location: 'Mogadishu, Somalia'
   });

@@ -7,7 +7,7 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [settings, setSettings] = useState({
-    company_email: 'hello@onetapsolution.com',
+    company_email: 'onetapsolution6@gmail.com',
     contact_phone: '+252 61 9586339',
     office_location: 'Mogadishu, Somalia'
   });
