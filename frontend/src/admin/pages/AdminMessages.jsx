@@ -24,26 +24,26 @@ const AdminMessages = () => {
         m.email.toLowerCase().includes(search.toLowerCase())
     );
 
-    const fetchSubscribers = async () => {
-        if (!user?.token) return;
-        try {
-            const res = await fetch(`${API_URL}/api/newsletter/`, {
-                headers: { 'Authorization': `Bearer ${user.token}` }
-            });
-            const result = await res.json();
-            if (result.success && result.data) {
-                setSubscribers(result.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch subscribers:", err);
-        }
-    };
-
     useEffect(() => {
+        const fetchSubscribers = async () => {
+            if (!user?.token) return;
+            try {
+                const res = await fetch(`${API_URL}/api/newsletter/`, {
+                    headers: { 'Authorization': `Bearer ${user.token}` }
+                });
+                const result = await res.json();
+                if (result.success && result.data) {
+                    setSubscribers(result.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch subscribers:", err);
+            }
+        };
+
         if (activeTab === 'subscribers') {
             fetchSubscribers();
         }
-    }, [activeTab]);
+    }, [activeTab, user?.token, API_URL]);
 
     const handleDeleteSubscriber = async (id) => {
         if (!confirm('Are you sure you want to delete this subscriber?')) return;
