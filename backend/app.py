@@ -55,18 +55,18 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
     
-    # Initialize CORS — support comma-separated list of origins
+    # Initialize CORS — relax for production usage to ensure all devices can connect
     raw_origins = app.config.get('FRONTEND_URL', '*')
-    if config_name == 'production' and (not raw_origins or raw_origins == '*'):
-        raise ValueError("FRONTEND_URL must be strictly defined in production!")
-    # Split by comma to allow multiple origins (e.g. Vercel URL + localhost)
+    if not raw_origins:
+        raw_origins = '*'
+        
+    # Split by comma to allow multiple origins
     origins = [o.strip() for o in raw_origins.split(',')] if ',' in str(raw_origins) else raw_origins
     CORS(app, resources={r"/api/*": {"origins": origins}}, supports_credentials=True)
     
-    # Initialize Talisman for security headers
+    # Initialize Talisman for security headers — relax CSP for API focus
     is_prod = config_name == 'production'
-    # For API, we might need to adjust CSP, but default is usually fine for pure JSON APIs
-    Talisman(app, force_https=is_prod, session_cookie_secure=is_prod)
+    Talisman(app, force_https=is_prod, session_cookie_secure=is_prod, content_security_policy=None)
     
     # Initialize Database and Migrate
     db.init_app(app)
